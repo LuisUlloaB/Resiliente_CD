@@ -16,7 +16,7 @@ def main():
 		   '4':['rds',12],
 		   '5':['tdt',10],
 		   '6':['manual',12]}
-	client = ModbusClient(method='rtu', port='/dev/ttyUSB0', stopbits=1, bytesize=8, parity='N', baudrate=19200, timeout=3)
+	client = ModbusClient(method='rtu', port='/dev/ttyUSB0', stopbits=1, bytesize=8, parity='N', baudrate=19200, timeout=6)
 	connection = client.connect()
 	sorted(modulos.items())
 
@@ -30,9 +30,10 @@ def main():
 	f = time.strftime("%Y %m %d %H:%M:%S", time.localtime())
 	f_rtc = [int(f[:4]),int(f[5:7]),int(f[8:10]),int(f[11:13]),int(f[14:16]),int(f[17:])]
 	set = client.write_registers(0,f_rtc,unit = 6)
-
+	global primer_act
 	while True:
 		for mod in modulos.items():
+			print(mod[0])
 			if mod[0] == '4' or mod[0] == '6':
 				reg = client.read_holding_registers(0,mod[1][1],unit=int(mod[0]))
 				print("[+] Registros Monitoreo ",mod[1][0],": ",reg.registers)
@@ -52,7 +53,6 @@ def main():
 						print("[!][!][!][!][!]******************** Intento de Activación - RDS ********************[!][!][!][!][!]")
 						act = client.read_holding_registers(mod[1][1],(86-mod[1][1]),unit=int(mod[0]))
 						print("[+] Registros Activacion via ",mod[1][0],": ",act.registers)
-						global primer_act
 						if primer_act == True:
 							activ.activar(act.registers,int(mod[0]),primer_intento=True)
 							primer_act = False
@@ -71,12 +71,16 @@ def main():
 					print("[!] Sqlite3 error, ID: ",e.args[0])
 				else:
 					conn.close()
-					if reg.registers[1] == 1:
+					if reg.registers[6] == 1:
 						print("[!][!][!][!][!]*****************Intento de Activación - MANUAL******************[!][!][!][!][!]")
 						act = client.read_holding_registers(mod[1][1], (86-mod[1][1]), unit = int(mod[0]))
 						print("[+] Registros Activacion via ",mod[1][0],": ",act.registers)
-						#FALTAAAA
-			time.sleep(1)
+						if primer_act == True:
+							activ.activar(act.registers,int(mod[0]),primer_intento=True)
+							primer_act = False
+						else:
+							activ.activar(act.registers,int(mod[0]))
+			time.sleep(2)
 	client.close()
 	return 1
 

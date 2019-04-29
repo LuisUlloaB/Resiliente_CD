@@ -57,7 +57,13 @@ def activar(reg,id_slave,primer_intento = False):
 		'color':['Rojo','Ambar','Verde']}
 
 	#extraer data
-	var_audio = {'estado':str(reg[6]),'evento':str(reg[11]),'severidad':str(reg[14]),'respuesta':str(reg[12]),'urgencia':str(reg[13]),'mensaje':str(reg[7])}
+	var_audio = {
+			'estado':CAP["estado"][reg[6]],
+			'evento':CAP["evento"][reg[11]],
+			'severidad':CAP["severidad"][reg[14]],
+			'respuesta':CAP["tipo_respuesta"][reg[12]],
+			'urgencia':CAP["urgencia"][reg[13]],
+			'mensaje':CAP["tipo_mensaje"][reg[7]]}
 	print(var_audio)
 
 	area = str(reg[32]) + str(reg[33])
