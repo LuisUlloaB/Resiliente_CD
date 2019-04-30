@@ -1,0 +1,8 @@
+{
+    "evento": "crecidaRio",
+    "respuesta": "evacuar",
+    "mensaje": "alerta",
+    "severidad": "moderado",
+    "estado": "actual",
+    "urgencia": "Inmediato"
+}
