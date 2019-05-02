@@ -1,38 +1,54 @@
 import os
 import json
 
-os.system("(dmesg | grep '.*usb 1-1.4.*ttyUSB.$') > ports.txt")
-file = open('ports.txt','r')
-file.read(63)
-port_activ_monit = file.read(7)
-file.close()
+def main():
+	desc = "disconnect"
+	conn = "attached"
+	p = [0,0]
+	t = [0,0]
+	mesg = ["(dmesg | grep '.*usb 1-1.4.*') > ports.txt","(dmesg | grep '.*usb 1-1.2.*') > ports.txt"]
 
-os.system("(dmesg | grep '.*usb 1-1.2.*ttyUSB.$') > ports.txt")
-file = open('ports.txt','r')
-file.read(63)
-port_test = file.read(7)
-file.close()
+	for i in range(2):
+		os.system(mesg[i])
+		file = open('ports.txt','r')
 
-os.system("rm ports.txt")
+		for l in file:
+			c = l.find(conn)
+			d = l.find(desc)
+			if c != -1 or d != -1:
+				if float(l[1:13]) > t[i]:
+					t[i] = float(l[1:13])
+					if c != -1:
+						p[i] = l[-8:-1]
+					if d != -1:
+						p[i] = "none"
+		file.close()
 
-ports = {
-	'puertos':{
-		'monit_activ':{
-			'fisico':"usb 1-1.4",
-			'logico':port_activ_monit,
-			'referencia':"TOP - RIGHT"
-		},
-		'test':{
-			'fisico':"usb 1-1.2",
-			'logico':port_test,
-			'referencia':"TOP - LEFT"
+	os.system("rm ports.txt")
+
+	ports = {
+		'puertos':{
+			'monit_activ':{
+				'fisico':"usb 1-1.4",
+				'logico':p[0],
+				'referencia':"TOP - RIGHT"
+			},
+			'test':{
+				'fisico':"usb 1-1.2",
+				'logico':p[1],
+				'referencia':"TOP - LEFT"
+			}
 		}
 	}
-}
 
-with open("config.json") as cfg:
-	config = json.load(cfg)
-config['puertos'] = ports['puertos']
+	with open("config.json") as cfg:
+		config = json.load(cfg)
 
-with open("config.json","w") as f:
-	json.dump(config, f, indent=4, sort_keys=True)
+	config['puertos'] = ports['puertos']
+
+	with open("config.json","w") as f:
+		json.dump(config, f, indent=4, sort_keys=True)
+
+
+if __name__ == '__main__':
+	main()

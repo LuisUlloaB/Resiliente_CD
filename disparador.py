@@ -81,7 +81,6 @@ def main():
 			print("Duración: "+str(d)+" segundos")
 		else:
 			gpio.output(23,0)
-		#break
 		time.sleep(1)
 
 def get_activ(conn):
@@ -93,8 +92,6 @@ def get_activ(conn):
 	for x in tiempos:
 		inicio = x[0]
 		final = x[1]
-	#with open('audio_param-json') as f:
-	#	audio_param = json.load(f)
 
 def get_monit_rds(conn):
 	global p_sistema
@@ -145,15 +142,15 @@ def verificar_patron(mod):
 			p_sistema['rds']['type'] = "Error"
 			print("[!] Enviando reporte JSON a servidor web...")
 			sftp.envio(p_sistema['rds'])
-#	elif mod == 'manual':
-#		if p_sistema['manual']['data']['fecha'] > (int(time.time()) -18010):
-#			print("[+] Parámetros ",mod,": OK")
-#		else:
-#			print("[!] Parámetros ",mod,": Error")
-#			p_sistema['manual']['type'] = "Error"
-#			print(p_sistema['manual']['data']['fecha'])
-#			print("[!] Enviando reporte JSON a servidor web...")
-#			sftp.envio(p_sistema['manual'])
+	elif mod == 'manual':
+		if p_sistema['manual']['data']['fecha'] > (int(time.time()) -18010):
+			print("[+] Parámetros ",mod,": OK")
+		else:
+			print("[!] Parámetros ",mod,": Error")
+			p_sistema['manual']['type'] = "Error"
+			print(p_sistema['manual']['data']['fecha'])
+			print("[!] Enviando reporte JSON a servidor web...")
+			sftp.envio(p_sistema['manual'])
 
 if __name__ == '__main__':
 	print("[+] Script controlador de activacion")

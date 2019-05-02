@@ -1,22 +1,23 @@
 '''resiliente.py -  PyModBus#1 - 	Raspberry pi -> Master
 					RDS -> Slave (id=0x01)
 '''
-#import sys
+import json
 import activador as activ
 import time
 import sqlite3
 from pymodbus.client.sync import ModbusSerialClient as ModbusClient
 from pymodbus.register_read_message import ReadInputRegistersResponse
+import pymodbus.exceptions
 
 primer_act = True
 def main():
-	modulos = {'1':['gabinete',4],
-		   '2':['controlador',7],
-		   '3':['amplificador',5],
-		   '4':['rds',12],
-		   '5':['tdt',10],
-		   '6':['manual',12]}
-	client = ModbusClient(method='rtu', port='/dev/ttyUSB0', stopbits=1, bytesize=8, parity='N', baudrate=19200, timeout=6)
+	with open("config.json") as cfg:
+		sistema = json.load(cfg)
+
+	activ_monit_port = '/dev/' + sistema['puertos']['monit_activ']['logico']
+	modulos = sistema['modulos']
+
+	client = ModbusClient(method='rtu', port=activ_monit_port, stopbits=1, bytesize=8, parity='N', baudrate=19200, timeout=6)
 	connection = client.connect()
 	sorted(modulos.items())
 
@@ -32,17 +33,18 @@ def main():
 	set = client.write_registers(0,f_rtc,unit = 6)
 	global primer_act
 	while True:
-		for mod in modulos.items():
-			print(mod[0])
-			if mod[0] == '4' or mod[0] == '6':
-				reg = client.read_holding_registers(0,mod[1][1],unit=int(mod[0]))
-				print("[+] Registros Monitoreo ",mod[1][0],": ",reg.registers)
+		for mod in sorted(modulos.items()):
+			reg = client.read_holding_registers(0,mod[1]['monit_tamanio'],unit=int(mod[0]))
+			if not reg.isError():
+				print("[+] Registros Monitoreo ",mod[1]['nombre'],": ",reg.registers)
+			else:
+				print("[!] Módulo ",mod[1]['nombre']," no responde!")
 			if mod[0] == '4':
 				reg.registers[0] /= 10.0
 				try:
 					print("[+] Conectando a la base de datos: resiliente.db")
 					conn = sqlite3.connect('resiliente.db')
-					print("[+] Insertando registros en tabla: ",mod[1][0])
+					print("[+] Insertando registros en tabla: ",mod[1]['nombre'])
 					conn.execute('''INSERT INTO rds (frequency,lock,rds_state,state_2a,state_9a,state_11a,general_state,temperature,current1,voltage1,current2,voltage2) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)''', reg.registers)
 					conn.commit()
 				except sqlite3.Error as e:
@@ -51,8 +53,8 @@ def main():
 					conn.close()
 					if reg.registers[4] == 1 or reg.registers[5] == 1:
 						print("[!][!][!][!][!]******************** Intento de Activación - RDS ********************[!][!][!][!][!]")
-						act = client.read_holding_registers(mod[1][1],(86-mod[1][1]),unit=int(mod[0]))
-						print("[+] Registros Activacion via ",mod[1][0],": ",act.registers)
+						act = client.read_holding_registers(mod[1]['monit_tamanio'],(86-mod[1]['monit_tamanio']),unit=int(mod[0]))
+						print("[+] Registros Activacion via ",mod[1]['nombre'],": ",act.registers)
 						if primer_act == True:
 							activ.activar(act.registers,int(mod[0]),primer_intento=True)
 							primer_act = False
@@ -64,7 +66,7 @@ def main():
 				try:
 					print("[+] Conectando a la base de datos: resiliente.db")
 					conn = sqlite3.connect('resiliente.db')
-					print("[+] Insertando registros en tabla: ",mod[1][0])
+					print("[+] Insertando registros en tabla: ",mod[1]['nombre'])
 					conn.execute('''INSERT INTO manual (fecha,boton,temperature,current1,voltage1,current2,voltage2) VALUES (?,?,?,?,?,?,?)''',(rtc_manual,reg.registers[6],reg.registers[7],reg.registers[8],reg.registers[9],reg.registers[10],reg.registers[11]))
 					conn.commit()
 				except sqlite3.Error as e:
@@ -73,14 +75,13 @@ def main():
 					conn.close()
 					if reg.registers[6] == 1:
 						print("[!][!][!][!][!]*****************Intento de Activación - MANUAL******************[!][!][!][!][!]")
-						act = client.read_holding_registers(mod[1][1], (86-mod[1][1]), unit = int(mod[0]))
-						print("[+] Registros Activacion via ",mod[1][0],": ",act.registers)
+						act = client.read_holding_registers(mod[1]['monit_tamanio'], (86-mod[1]['monit_tamanio']), unit = int(mod[0]))
+						print("[+] Registros Activacion via ",mod[1]['nombre'],": ",act.registers)
 						if primer_act == True:
 							activ.activar(act.registers,int(mod[0]),primer_intento=True)
 							primer_act = False
 						else:
 							activ.activar(act.registers,int(mod[0]))
-			time.sleep(2)
 	client.close()
 	return 1
 
