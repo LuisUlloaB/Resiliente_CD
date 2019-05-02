@@ -1,0 +1,40 @@
+{
+    "modulos": {
+        "1": {
+            "monit_tamanio": 4,
+            "nombre": "gabinete"
+        },
+        "2": {
+            "monit_tamanio": 7,
+            "nombre": "controlador"
+        },
+        "3": {
+            "monit_tamanio": 5,
+            "nombre": "amplificador"
+        },
+        "4": {
+            "monit_tamanio": 12,
+            "nombre": "rds"
+        },
+        "5": {
+            "monit_tamanio": 10,
+            "nombre": "tdt"
+        },
+        "6": {
+            "monit_tamanio": 12,
+            "nombre": "manual"
+        }
+    },
+    "puertos": {
+        "monit_activ": {
+            "fisico": "usb 1-1.4",
+            "logico": "ttyUSB0",
+            "referencia": "TOP - RIGHT"
+        },
+        "test": {
+            "fisico": "usb 1-1.2",
+            "logico": "ttyUSB1",
+            "referencia": "TOP - LEFT"
+        }
+    }
+}

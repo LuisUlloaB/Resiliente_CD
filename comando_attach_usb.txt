@@ -1,1 +1,0 @@
-dmesg | grep '.*usb 1-1.*ttyUSB.$'
