@@ -1,18 +1,18 @@
 {
     "data": {
+        "current1": 128.0,
+        "state_9a": 0,
+        "state_2a": 0,
+        "general_state": 0,
+        "voltage1": 64.0,
+        "rds_state": 0,
+        "temperature": 27.0,
+        "lock": 0,
+        "frequency": 107.9,
         "state_11a": 0,
         "current2": 128.0,
-        "state_2a": 0,
-        "voltage1": 64.0,
-        "lock": 0,
-        "current1": 128.0,
-        "frequency": 107.9,
-        "voltage2": 64.0,
-        "temperature": 27.0,
-        "state_9a": 0,
-        "rds_state": 0,
-        "general_state": 0
+        "voltage2": 64.0
     },
     "idname": "rds",
-    "type": ""
+    "type": "Error"
 }
