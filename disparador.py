@@ -1,18 +1,14 @@
-#!/usr/bin/python
-'''Creación de variables de entorno en: /etc/profile
-ejecutar con: sudo nano /etc/profile
-
-poner:
-export F_CREACION="0"
-export F_INICIO="0"
-export F_FINAL="0"
-export F_EFECTIVO="0"
+'''Disparador.py:
+			- Error en Monitoreo		[x]
+			- Notificacion de Activacion	[ ]
+			- Request/response Monitoreo	[ ]
 '''
 import time
 import RPi.GPIO as gpio
 import sqlite3
 import sftp as sftp
 import json
+import os
 gpio.setmode(gpio.BCM)
 gpio.setwarnings(False)
 gpio.setup(23, gpio.OUT, initial=0)
@@ -70,7 +66,8 @@ def main():
 			get_activ(conn)
 		except sqlite3.Error as e:
 			print("[!] Sqlite3 error, ID: ",e.args[0])
-		conn.close()
+		monit_request_response() #Funcion para verificar solicitud-monit de web
+		activ_request(conn) #Funcion para atender Activacion via web
 		global inicio,final
 		print("--> Epoch actual: " + str(int(time.time())-18000))
 		print("--> Epoch de inicio: "+str(inicio))
@@ -81,7 +78,69 @@ def main():
 			print("Duración: "+str(d)+" segundos")
 		else:
 			gpio.output(23,0)
+		conn.close()
 		time.sleep(1)
+
+def activ_request(conn):
+	try:
+		with open('/home/pi/Resiliente_CD/Activation.json','r') as f_act:
+			print("[+] Existe Activacion via web")
+			p_act = json.load(f_act)
+			try:
+				print("[+] Insertando a DB: resiliente.db")
+				conn.execute('''INSERT INTO activacion (slave,identificador,fecha_hora,estado,tipo_mensaje,ambito,idioma,categoria,evento,tipo_respuesta,urgencia,severidad,certeza,color_alerta,fecha_efectivo,fecha_inicio,fecha_fin,
+					area,texto) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (p_act["data"]["slave"],p_act["data"]["identificador"],p_act["data"]["fecha_hora"],p_act["data"]["estado"],p_act["data"]["tipo_mensaje"],
+					p_act["data"]["ambito"],p_act["data"]["idioma"],p_act["data"]["categoria"],p_act["data"]["evento"],p_act["data"]["tipo_respuesta"],p_act["data"]["urgencia"],p_act["data"]["severidad"],
+					p_act["data"]["certeza"],p_act["data"]["color_alerta"],p_act["data"]["fecha_efectivo"],p_act["data"]["fecha_inicio"],p_act["data"]["fecha_fin"],p_act["data"]["area"],p_act["data"]["texto"]))
+				conn.commit()
+			except sqlite3.Error as e:
+				print("[!] Sqlite3 error, ID: ",e.args[0])
+			print("[+] Extrayendo parámetros de audio")
+			var_audio = {
+				'estado':p_act["data"]["estado"],
+				'evento':p_act["data"]["evento"],
+				'severidad':p_act["data"]["severidad"],
+				'respuesta':p_act["data"]["tipo_respuesta"],
+				'urgencia':p_act["data"]["urgencia"],
+				'mensaje':p_act["data"]["tipo_mensaje"],
+			}
+			print("[+] Generando fichero de audio 'audio_param.json' ")
+			with open('audio_param.json','w') as file:
+				json.dump(var_audio,file,indent=4)
+			os.system('rm Activation.json')
+	except FileNotFoundError:
+		print("[!] No existe activacion via web")
+
+def monit_request_response():
+	#verificar request de monitoreo y responder
+	try:
+		with open('/home/pi/Resiliente_CD/Request.json','r') as f_rq:
+			print("[+] Existe solicitud de monitoreo")
+			rq = json.load(f_rq)
+			flag = {
+				'gabinete':False,
+				'controlador_digital':False,
+				'amplificador_izq':False,
+				'rds':False,
+				'tdt':False,
+				'manual':False,
+				'amplificador_der':False
+			}
+			if rq['type'] == "Request":
+				for m in rq['modules']:
+					flag[m] = True
+				re = {
+					'type':"Response"
+				}
+				for f in flag.items():
+					if f[1] == True:
+						re[f[0]] = p_sistema[f[0]]['data']
+				sftp.envio(re,name="Response")
+			else:
+				print("[!] Request.json no válido: Error")
+			os.system('rm Response.json Request.json')
+	except FileNotFoundError:
+		print("[!] No existe solicitud de monitoreo")
 
 def get_activ(conn):
 	global inicio, final

@@ -1,13 +1,13 @@
 {
-    "data": {
-        "fecha": 1556821653,
-        "current1": 0.0,
-        "temperature": 27.6,
-        "voltage2": 0.0,
-        "boton": 1,
-        "current2": 0.0,
-        "voltage1": 0.0
-    },
     "idname": "manual",
-    "type": "Error"
+    "type": "Error",
+    "data": {
+        "voltage2": 0.0,
+        "boton": 0,
+        "fecha": 1556995574,
+        "voltage1": 0.0,
+        "current1": 0.0,
+        "temperature": 27.0,
+        "current2": 0.0
+    }
 }

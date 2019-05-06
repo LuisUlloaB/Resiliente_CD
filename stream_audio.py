@@ -30,8 +30,8 @@ def main():
 		print("Now:	"+str(now))
 		if (int(time.time()) - 18000) >= int(inicio) and (int(time.time()) - 18000) <= int(fin):
 			audio_gen(True)
-		else:
-			audio_gen(False)
+		#else:
+		#	audio_gen(False)
 		time.sleep(1)
 
 def audio_gen(estado):
@@ -43,7 +43,7 @@ def audio_gen(estado):
 	y = "audios/alerta_crecidaRio_evacuar_inmediata.wav"
 	instance = vlc.Instance()
 	player = instance.media_player_new()
-	player.audio_set_volume(100)
+	player.audio_set_volume(200)
 	if estado == True:
 		if slaveID == 6:
 			media = instance.media_new(y)

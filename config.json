@@ -6,11 +6,11 @@
         },
         "2": {
             "monit_tamanio": 7,
-            "nombre": "controlador"
+            "nombre": "controlador_digital"
         },
         "3": {
             "monit_tamanio": 5,
-            "nombre": "amplificador"
+            "nombre": "amplificador_izq"
         },
         "4": {
             "monit_tamanio": 12,
@@ -23,17 +23,21 @@
         "6": {
             "monit_tamanio": 12,
             "nombre": "manual"
+        },
+        "7": {
+            "monit_tamanio": 5,
+            "nombre": "amplificador_der"
         }
     },
     "puertos": {
         "monit_activ": {
             "fisico": "usb 1-1.4",
-            "logico": "ttyUSB0",
+            "logico": "ttyUSB1",
             "referencia": "TOP - RIGHT"
         },
         "test": {
             "fisico": "usb 1-1.2",
-            "logico": "ttyUSB1",
+            "logico": "ttyUSB0",
             "referencia": "TOP - LEFT"
         }
     }

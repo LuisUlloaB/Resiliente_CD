@@ -1,8 +1,8 @@
 {
-    "severidad": "moderado",
-    "estado": "actual",
-    "urgencia": "Inmediato",
-    "evento": "crecidaRio",
+    "severidad": "severo",
     "mensaje": "alerta",
-    "respuesta": "evacuar"
+    "evento": "tormenta",
+    "respuesta": "evacuar",
+    "estado": "simulacro",
+    "urgencia": "Inmediato"
 }

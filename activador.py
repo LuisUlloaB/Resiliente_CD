@@ -64,36 +64,36 @@ def activar(reg,id_slave,primer_intento = False):
 			'respuesta':CAP["tipo_respuesta"][reg[12]],
 			'urgencia':CAP["urgencia"][reg[13]],
 			'mensaje':CAP["tipo_mensaje"][reg[7]]}
-	print(var_audio)
+	print("\t\t\t└---",var_audio)
 
 	area = str(reg[32]) + str(reg[33])
 	texto = ""
 	for i in reg[34:74]:
 		texto += str(chr(i))
-	print("Texto: ",texto)
+	print("\t\t\t└---Texto: ",texto)
 
 	fecha_hora = mjd_inversor(reg[1:3])
 	fecha_hora += " " + str(reg[3]) + ":" + str(reg[4]) + ":" + str(reg[5])
 	epoch_fecha_hora = datetime_converter(fecha_hora)
-	print("Fecha_Hora: ",fecha_hora)
+	print("\t\t\t└---Fecha_Hora: ",fecha_hora)
 
 	efectivo = mjd_inversor(reg[17:19])
 	efectivo += " " + str(reg[19]) + ":" + str(reg[20]) + ":" + str(reg[21])
 	epoch_efectivo = datetime_converter(efectivo)
-	print("efectivo: ",efectivo)
+	print("\t\t\t└---efectivo: ",efectivo)
 
 	inicio = mjd_inversor(reg[22:24])
 	inicio += " " + str(reg[24]) + ":" + str(reg[25]) + ":" + str(reg[26])
 	epoch_inicio = datetime_converter(inicio)
-	print("inicio: ",inicio)
+	print("\t\t\t└---inicio: ",inicio)
 
 	final = mjd_inversor(reg[27:29])
 	final += " " + str(reg[29]) + ":" + str(reg[30]) + ":" + str(reg[31])
 	epoch_final = datetime_converter(final)
-	print("final: ",final)
+	print("\t\t\t└---final: ",final)
 
 	interval = epoch_final - epoch_inicio
-	print(interval)
+	print("\t\t\t└---Duracion: ",str(interval)," segs")
 
 	global last_f_creacion
 	global last_f_inicio
@@ -102,37 +102,34 @@ def activar(reg,id_slave,primer_intento = False):
 		last_f_creacion = epoch_fecha_hora
 		last_f_inicio = epoch_inicio
 		last_f_final = epoch_final
-		print("[+] Primer intento")
-		print("OK")
+		print("\t\t\t└---[+] Primer intento: OK")
 	else:
 		if last_f_creacion == epoch_fecha_hora or last_f_inicio == epoch_inicio or last_f_final == epoch_final:
-			print("[!] Activacion no valido!")
-			print("Error")
-			print("[!][!][!][!][!]*****************************END*****************************[!][!][!][!][!]")
+			print("\t\t\t└---[!] Activacion no valido: Error")
+			print("\t\t└--[!][!][!][!][!]*****************************END*****************************[!][!][!][!][!]")
 			return -1
 		else:
 			last_f_creacion = epoch_fecha_hora
 			last_f_inicio = epoch_inicio
 			last_f_final = epoch_final
-			print("[+] Activacion Valida!!")
-			print("OK")
+			print("\t\t\t└---[+] Activacion Valida: OK")
 
 	#ingresar a base de datos
 	try:
-		print("[+] Conectando a la base de datos: resiliente.db")
+		print("\t\t\t└---[+] Conectando a la base de datos: resiliente.db")
 		conn = sqlite3.connect('resiliente.db')
-		print("[+] Insertando data en tabla: activacion")
+		print("\t\t\t└---[+] Insertando data en tabla: activacion")
 		conn.execute('''INSERT INTO activacion (slave,identificador,fecha_hora,estado,tipo_mensaje,ambito,idioma,categoria,evento,tipo_respuesta,urgencia,severidad,certeza,color_alerta,fecha_efectivo,fecha_inicio,fecha_fin,area,texto) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',(id_slave,CAP["identificador"][reg[0]],str(epoch_fecha_hora),CAP["estado"][reg[6]],CAP["tipo_mensaje"][reg[7]],CAP["ambito"][reg[8]],CAP["idioma"][reg[9]],CAP["categoria"][reg[10]],CAP["evento"][reg[11]],CAP["tipo_respuesta"][reg[12]],CAP["urgencia"][reg[13]],CAP["severidad"][reg[14]],CAP["certeza"][reg[15]],CAP["color"][reg[16]],str(epoch_efectivo),str(epoch_inicio),str(epoch_final),area,texto))
 		conn.commit()
 	except sqlite3.Error as e:
-		print("[!] Sqlite3 error, ID: ",e.args[0])
+		print("\t\t\t└---[!] Sqlite3 error, ID: ",e.args[0])
 	conn.close()
 
 	#parámetros para audio
 	with open('audio_param.json','w') as file:
 		json.dump(var_audio,file,indent=4)
 
-	print("[!][!][!][!][!]*****************************END*****************************[!][!][!][!][!]")
+	print("\t\t└--[!][!][!][!][!]*****************************END*****************************[!][!][!][!][!]")
 
 
 	#enviar señal de encendido a sub módulo de potencia
