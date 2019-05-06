@@ -51,8 +51,8 @@ _Scripts usados para pruebas_
 ## Tareas pendientes
 - [x] Monitoreo de módulos del sistema
 - [x] Activación de alerta por módulos receptores (RDS, TDT y Manual)
-- [ ] Activación de alerta por Servidor Web
-- [ ] Fichero de configuración de parámetros del sistema
+- [x] Activación de alerta por Servidor Web
+- [x] Fichero de configuración de parámetros del sistema
 - [ ] Desarrollo del modo Test
 - [ ] Automatizar ejecución de scripts usando demonios y servicios
 - [ ] Desarrollo de Sub - Módulo de sensores (STM32)
