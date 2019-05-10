@@ -200,7 +200,7 @@ def verificar_patron(mod):
 			print("[!] Parámetros ",mod,": Error")
 			p_sistema['rds']['type'] = "Error"
 			print("[!] Enviando reporte JSON a servidor web...")
-			sftp.envio(p_sistema['rds'])
+			sftp.envio(p_sistema['rds'],name="Error")
 	elif mod == 'manual':
 		if p_sistema['manual']['data']['fecha'] > (int(time.time()) -18010):
 			print("[+] Parámetros ",mod,": OK")
@@ -209,7 +209,7 @@ def verificar_patron(mod):
 			p_sistema['manual']['type'] = "Error"
 			print(p_sistema['manual']['data']['fecha'])
 			print("[!] Enviando reporte JSON a servidor web...")
-			sftp.envio(p_sistema['manual'])
+			sftp.envio(p_sistema['manual'],name="Error")
 
 if __name__ == '__main__':
 	print("[+] Script controlador de activacion")

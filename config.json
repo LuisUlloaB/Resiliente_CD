@@ -32,13 +32,18 @@
     "puertos": {
         "monit_activ": {
             "fisico": "usb 1-1.4",
-            "logico": "ttyUSB1",
-            "referencia": "TOP - RIGHT"
+            "logico": "ttyUSB0",
+            "referencia": "UP - LEFT"
         },
         "test": {
             "fisico": "usb 1-1.2",
-            "logico": "ttyUSB0",
-            "referencia": "TOP - LEFT"
+            "logico": 0,
+            "referencia": "UP - RIGHT"
         }
+    },
+    "servidor": {
+        "ip": "10.0.114.10",
+        "password": "admin123",
+        "user": "admin"
     }
 }

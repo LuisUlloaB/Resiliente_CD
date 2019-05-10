@@ -31,22 +31,22 @@ def main():
 			'monit_activ':{
 				'fisico':"usb 1-1.4",
 				'logico':p[0],
-				'referencia':"TOP - RIGHT"
+				'referencia':"UP - LEFT"
 			},
 			'test':{
 				'fisico':"usb 1-1.2",
 				'logico':p[1],
-				'referencia':"TOP - LEFT"
+				'referencia':"UP - RIGHT"
 			}
 		}
 	}
 
-	with open("config.json") as cfg:
+	with open("/home/pi/Resiliente_CD/config.json") as cfg:
 		config = json.load(cfg)
 
 	config['puertos'] = ports['puertos']
 
-	with open("config.json","w") as f:
+	with open("/home/pi/Resiliente_CD/config.json","w") as f:
 		json.dump(config, f, indent=4, sort_keys=True)
 
 

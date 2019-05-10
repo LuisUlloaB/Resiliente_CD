@@ -2,16 +2,18 @@ import pysftp
 import json
 
 def envio(parametros,name='datos'):
-	server = "10.0.114.10"
-	user = "admin"
-	password = "admin123"
+	with open('/home/pi/Resiliente_CD/config.json','r') as cfg:
+		serv = json.load(cfg)
+		ip = serv['servidor']['ip']
+		user = serv['servidor']['user']
+		password = serv['servidor']['password']
 
 	sorted(parametros.items())
 	print(parametros)
 	with open((name+'.json'),'w') as file:
 		json.dump(parametros,file,indent=4)
 	#print(datos)
-	with pysftp.Connection(host=server, username=user, password=password) as sftp:
+	with pysftp.Connection(host=ip, username=user, password=password) as sftp:
 		print("Connection succesfully stablished ... ")
 
 		# cambio de directorio
