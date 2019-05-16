@@ -1,8 +1,8 @@
 {
-    "severidad": "severo",
-    "mensaje": "alerta",
-    "evento": "tormenta",
-    "respuesta": "evacuar",
     "estado": "simulacro",
-    "urgencia": "Inmediato"
+    "respuesta": "evacuar",
+    "severidad": "extremo",
+    "mensaje": "cancela",
+    "evento": "tsunami",
+    "urgencia": "inmediato"
 }

@@ -12,10 +12,10 @@ import pymodbus.exceptions
 primer_act = True
 def main():
 	try:
-		with open('/home/pi/Resiliente_CD/config.json','r') as cfg:
+		with open('/home/pi/Resiliente_CD/config/config.json','r') as cfg:
 			sistema = json.load(cfg)
 	except FileNotFoundError:
-		print("[!] NO EXISTE EL ARCHIVO")
+		print("[!] NO EXISTE FICHERO DE CONFIGURACION")
 		return -1
 
 	activ_monit_port = '/dev/' + sistema['puertos']['monit_activ']['logico']
@@ -43,55 +43,108 @@ def main():
 				reg = client.read_holding_registers(0,mod[1]['monit_tamanio'],unit=int(mod[0]))
 				if not reg.isError():
 					print("|-[+] Registros Monitoreo ",mod[1]['nombre'],": ",reg.registers)
-					if mod[0] == '4':
-						reg.registers[0] /= 10.0
-						try:
-							print("\t└-[+] Conectando a la base de datos: resiliente.db")
-							conn = sqlite3.connect('resiliente.db')
-							print("\t└-[+] Insertando registros en tabla: ",mod[1]['nombre'])
-							conn.execute('''INSERT INTO rds (frequency,lock,rds_state,state_2a,state_9a,state_11a,general_state,temperature,current1,voltage1,current2,voltage2) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)''', reg.registers)
-							conn.commit()
-						except sqlite3.Error as e:
-							print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
-						else:
+					try:
+						print("\t└-[+] Conectando a la base de datos: resiliente.db")
+						conn = sqlite3.connect('resiliente.db')
+					except sqlite3.Error as e:
+						print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
+					else:
+						if mod[0] == '1':
+							reg.registers[1] /= 10.0
+							reg.registers[2] /= 10.0
+							reg.registers[3] /= 10.0
+							try:
+								print("\t└-[+] Insertando registros en tabla: ",mod[1]['nombre'])
+								conn.execute('''INSERT INTO gabinete (sensor_puerta,temperatura,battery_current,battery_voltage) VALUES (?,?,?,?)''',reg.registers)
+								conn.commit()
+							except sqlite3.Error as e:
+								print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
 							conn.close()
-							if reg.registers[4] == 1 or reg.registers[5] == 1:
-								print("\t\t└--[!][!][!][!][!]******************** Intento de Activación - RDS ********************[!][!][!][!][!]")
-								act = client.read_holding_registers(mod[1]['monit_tamanio'],(86-mod[1]['monit_tamanio']),unit=int(mod[0]))
-								if not act.isError():
-									print("\t\t\t└---[+] Registros Activacion via ",mod[1]['nombre'],": ",act.registers)
-									if primer_act == True:
-										activ.activar(act.registers,int(mod[0]),primer_intento=True)
-										primer_act = False
+
+						elif mod[0] == '4':
+							reg.registers[0] /= 10.0
+							reg.registers[7] /= 10.0
+							reg.registers[8] /= 10.0
+							reg.registers[9] /= 10.0
+							reg.registers[10] /= 10.0
+							reg.registers[11] /= 10.0
+							try:
+								#print("\t└-[+] Conectando a la base de datos: resiliente.db")
+								#conn = sqlite3.connect('resiliente.db')
+								print("\t└-[+] Insertando registros en tabla: ",mod[1]['nombre'])
+								conn.execute('''INSERT INTO rds (frequency,lock,rds_state,state_2a,state_9a,state_11a,general_state,temperature,current1,voltage1,current2,voltage2) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)''', reg.registers)
+								conn.commit()
+							except sqlite3.Error as e:
+								print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
+							else:
+								conn.close()
+								if reg.registers[4] == 1 or reg.registers[5] == 1:
+									print("\t\t└--[!][!][!][!][!]******************** Intento de Activación - RDS ********************[!][!][!][!][!]")
+									act = client.read_holding_registers(mod[1]['monit_tamanio'],(86-mod[1]['monit_tamanio']),unit=int(mod[0]))
+									if not act.isError():
+										print("\t\t\t└---[+] Registros Activacion via ",mod[1]['nombre'],": ",act.registers)
+										if primer_act == True:
+											activ.activar(act.registers,int(mod[0]),primer_intento=True)
+											primer_act = False
+										else:
+											activ.activar(act.registers,int(mod[0]))
 									else:
-										activ.activar(act.registers,int(mod[0]))
-								else:
-									print("\t\t\t└---[!] No se pudo conseguir registros de Activacion ",mod[1]['nombre'])
-					elif mod[0] == '6':
-						rtc_manual = formato_fecha(reg.registers)
-						reg.registers[7] /= 10.0
-						try:
-							print("\t└-[+] Conectando a la base de datos: resiliente.db")
-							conn = sqlite3.connect('resiliente.db')
-							print("\t└-[+] Insertando registros en tabla: ",mod[1]['nombre'])
-							conn.execute('''INSERT INTO manual (fecha,boton,temperature,current1,voltage1,current2,voltage2) VALUES (?,?,?,?,?,?,?)''',(rtc_manual,reg.registers[6],reg.registers[7],reg.registers[8],reg.registers[9],reg.registers[10],reg.registers[11]))
-							conn.commit()
-						except sqlite3.Error as e:
-							print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
-						else:
-							conn.close()
-							if reg.registers[6] == 1:
-								print("\t\t└--[!][!][!][!][!]*****************Intento de Activación - MANUAL******************[!][!][!][!][!]")
-								act = client.read_holding_registers(mod[1]['monit_tamanio'], (86-mod[1]['monit_tamanio']), unit = int(mod[0]))
-								if not act.isError():
-									print("\t\t\t└---[+] Registros Activacion via ",mod[1]['nombre'],": ",act.registers)
-									if primer_act == True:
-										activ.activar(act.registers,int(mod[0]),primer_intento=True)
-										primer_act = False
+										print("\t\t\t└---[!] No se pudo conseguir registros de Activacion ",mod[1]['nombre'])
+
+						elif mod[0] == '5':
+							reg.registers[3] = str(reg.registers[3]) ##<- probar esta linea
+							try:
+								#print("\t└-[+] Conectando a la base de datos: resiliente.db")
+								#conn = sqlite3.connect('resiliente.db')
+								print("\t└-[+] Insertando registros en tabla: ",mod[1]['nombre'])
+								conn.execute('''INSERT INTO tdt (frecuencia,lock,bandwidth,area,flag_EWBS,flag_TMCC,temperatura,current_1,voltage_1,current_2,voltage_2) VALUES (?,?,?,?,?,?,?,?,?,?,?)''',reg.registers)
+								conn.commit()
+							except sqlite3.Error as e:
+								print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
+							else:
+								conn.close()
+								if reg.registers[4] == 1:
+									print("\t\t└--[!][!][!][!][!]******************** Intento de Activación - TDT ********************[!][!][!][!][!]")
+									act = client.read_holding_registers(mod[1]['monit_tamanio'],(86-mod[1]['monit_tamanio']),unit=int(mod[0]))
+									if not act.isError():
+										print("\t\t\t└---[+] Registros Activacion via ",mod[1]['nombre'],": ",act.registers)
+										if primer_act == True:
+											activ.activar(act.registers,int(mod[0]),primer_intento=True)
+											primer_act = False
+										else:
+											activ.activar(act.registers,int(mod[0]))
 									else:
-										activ.activar(act.registers,int(mod[0]))
-								else:
-									print("\t\t\t└---[!] No se pudo conseguir registros de Activacion ",mod[1]['nombre'])
+										print("\t\t\t└---[!] No se pudo conseguir registros de Activacion ",mod[1]['nombre'])
+
+						elif mod[0] == '6':
+							rtc_manual = formato_fecha(reg.registers)
+							reg.registers[8] /= 10.0
+							reg.registers[9] /= 10.0
+							reg.registers[10] /= 10.0
+							reg.registers[11] /= 10.0
+							reg.registers[12] /= 10.0
+							try:
+								#print("\t└-[+] Conectando a la base de datos: resiliente.db")
+								#conn = sqlite3.connect('resiliente.db')
+								print("\t└-[+] Insertando registros en tabla: ",mod[1]['nombre'])
+								conn.execute('''INSERT INTO manual (fecha,boton_activ,boton_cancel,temperature,current1,voltage1,current2,voltage2) VALUES (?,?,?,?,?,?,?,?)''',(rtc_manual,reg.registers[6],reg.registers[7],reg.registers[8],reg.registers[9],reg.registers[10],reg.registers[11],reg.registers[12]))
+								conn.commit()
+							except sqlite3.Error as e:
+								print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
+							else:
+								conn.close()
+								if reg.registers[6] == 1 or reg.registers[7] == 1:
+									print("\t\t└--[!][!][!][!][!]*****************Intento de Activación/Cancelador - MANUAL******************[!][!][!][!][!]")
+									act = client.read_holding_registers(mod[1]['monit_tamanio'], (87-mod[1]['monit_tamanio']), unit = int(mod[0]))
+									if not act.isError():
+										print("\t\t\t└---[+] Registros Activacion via ",mod[1]['nombre'],": ",act.registers)
+										if primer_act == True:
+											activ.activar(act.registers,int(mod[0]),primer_intento=True)
+											primer_act = False
+										else:
+											activ.activar(act.registers,int(mod[0]))
+									else:
+										print("\t\t\t└---[!] No se pudo conseguir registros de Activacion ",mod[1]['nombre'])
 				else:
 					print("|-[!] Módulo ",mod[1]['nombre']," no responde!")
 	except KeyboardInterrupt:

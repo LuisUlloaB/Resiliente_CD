@@ -4,7 +4,7 @@ import json
 def main():
 	desc = "disconnect"
 	conn = "attached"
-	p = [0,0]
+	p = ["none","none"]
 	t = [0,0]
 	mesg = ["(dmesg | grep '.*usb 1-1.4.*') > ports.txt","(dmesg | grep '.*usb 1-1.2.*') > ports.txt"]
 
@@ -41,12 +41,12 @@ def main():
 		}
 	}
 
-	with open("/home/pi/Resiliente_CD/config.json") as cfg:
+	with open("/home/pi/Resiliente_CD/config/config.json") as cfg:
 		config = json.load(cfg)
 
 	config['puertos'] = ports['puertos']
 
-	with open("/home/pi/Resiliente_CD/config.json","w") as f:
+	with open("/home/pi/Resiliente_CD/config/config.json","w") as f:
 		json.dump(config, f, indent=4, sort_keys=True)
 
 

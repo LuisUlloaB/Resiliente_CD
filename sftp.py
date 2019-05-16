@@ -2,19 +2,19 @@ import pysftp
 import json
 
 def envio(parametros,name='datos'):
-	with open('/home/pi/Resiliente_CD/config.json','r') as cfg:
+	with open('/home/pi/Resiliente_CD/config/config.json','r') as cfg:
 		serv = json.load(cfg)
 		ip = serv['servidor']['ip']
 		user = serv['servidor']['user']
 		password = serv['servidor']['password']
 
 	sorted(parametros.items())
-	print(parametros)
+	#print(parametros)
 	with open((name+'.json'),'w') as file:
 		json.dump(parametros,file,indent=4)
 	#print(datos)
 	with pysftp.Connection(host=ip, username=user, password=password) as sftp:
-		print("Connection succesfully stablished ... ")
+		print("[+] Connection succesfully stablished ... ")
 
 		# cambio de directorio
 		#sftp.cwd('/admin/archivos/')
@@ -23,10 +23,10 @@ def envio(parametros,name='datos'):
 
 		remoteFilePath = '/admin/archivos/'+name+'.json'
 		sftp.put(localFilePath, remoteFilePath)
-
-		sftp.cwd('/admin/archivos/')
-		directory_structure = sftp.listdir_attr()
+		print("[+] Fichero "+name+".json enviado correctamente")
+		#sftp.cwd('/admin/archivos/')
+		#directory_structure = sftp.listdir_attr()
 
 		#enlistar archivos
-		for attr in directory_structure:
-			print(attr.filename, attr)
+		#for attr in directory_structure:
+		#	print(attr.filename, attr)

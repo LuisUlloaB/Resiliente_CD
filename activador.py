@@ -45,13 +45,13 @@ def activar(reg,id_slave,primer_intento = False):
 	"""
 	CAP = {	'identificador':['Indeci','GobiernoLocal','Prueba','Otro'],
 		'estado':['actual','simulacro','prueba','alarma'],
-		'tipo_mensaje':['alerta','Actualiza','Cancela','confirmado','Error'],
+		'tipo_mensaje':['alerta','actualiza','cancela','confirmado','error'],
 		'ambito':['Publico','Privado'],
 		'idioma':['Espanol','Quechua','Ingles','Otro'],
 		'categoria':['GeodinamicaInterna','GeodinamicaExterna','Hidrometeorologico','Biologico','Humano','Seguridad','Otro'],
 		'evento':['actividadVolcanica','sismo','tsunami','alud','aluvion','derrumbeCerro','deslizamiento','crecidaRio','granizada','helada','huayco','inundacion','lluviaIntensa','marejada','nevada','sequia','tormenta','vientoFuerte','colapsoConstruccion','contaminacionAgua','contaminacionSuelo','explosion','derrameSustNocivas','incendioForestal','incendioUrbano','epidemia','plaga','otro'],
-		'tipo_respuesta':['Abrigarse','evacuar','preparar','ejecutar','monitorear','evaluar','otro','ninguno'],
-		'urgencia':['Inmediato','Esperado','futura','pasada','desconocida'],
+		'tipo_respuesta':['abrigarse','evacuar','preparar','ejecutar','monitorear','evaluar','otro','ninguno'],
+		'urgencia':['inmediato','esperado','futura','pasada','desconocida'],
 		'severidad':['extremo','severo','moderado','menor','desconocido'],
 		'certeza':['Confirmado','Probable','Improbable','Desconocido'],
 		'color':['Rojo','Ambar','Verde']}

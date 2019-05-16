@@ -21,7 +21,7 @@
             "nombre": "tdt"
         },
         "6": {
-            "monit_tamanio": 12,
+            "monit_tamanio": 13,
             "nombre": "manual"
         },
         "7": {
@@ -37,7 +37,7 @@
         },
         "test": {
             "fisico": "usb 1-1.2",
-            "logico": 0,
+            "logico": "none",
             "referencia": "UP - RIGHT"
         }
     },

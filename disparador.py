@@ -17,6 +17,7 @@ gpio.setup(23, gpio.OUT, initial=0)
 inicio = 0
 final = 0
 audio_param = 0
+t_mensaje = 0
 
 #parámetros del sistema
 p_sistema = {
@@ -43,7 +44,8 @@ p_sistema = {
 		'type':"",
 		'data':{
 			'fecha':0,
-			'boton':0,
+			'boton_activ':0,
+			'boton_cancel':0,
 			'temperature':0,
 			'current1':0,
 			'voltage1':0,
@@ -72,7 +74,7 @@ def main():
 		print("--> Epoch actual: " + str(int(time.time())-18000))
 		print("--> Epoch de inicio: "+str(inicio))
 		print("--> Epoch de fin: "+str(final))
-		if (int(time.time()) - 18000) >= int(inicio) and (int(time.time()) - 18000) <= int(final):
+		if (int(time.time()) - 18000) >= int(inicio) and (int(time.time()) - 18000) <= int(final) and t_mensaje != "cancela":
 			gpio.output(23,1)
 			d = int(final) - (int(time.time()) - 18000)
 			print("Duración: "+str(d)+" segundos")
@@ -143,14 +145,15 @@ def monit_request_response():
 		print("[!] No existe solicitud de monitoreo")
 
 def get_activ(conn):
-	global inicio, final
+	global inicio, final, t_mensaje
 	print("[+] Extrayendo parámetros tiempo de inicio - final  del ultimo registro de activación")
 	cur = conn.cursor()
-	cur.execute('''SELECT fecha_inicio,fecha_fin FROM activacion WHERE ID=(SELECT MAX(ID) FROM activacion)''')
+	cur.execute('''SELECT fecha_inicio,fecha_fin,tipo_mensaje FROM activacion WHERE ID=(SELECT MAX(ID) FROM activacion)''')
 	tiempos = cur.fetchall()
 	for x in tiempos:
 		inicio = x[0]
 		final = x[1]
+		t_mensaje = x[2]
 
 def get_monit_rds(conn):
 	global p_sistema
@@ -177,16 +180,17 @@ def get_monit_manual(conn):
 	global p_sistema
 	print("[+] Extrayendo parámetros de monitoreo 'manual'")
 	cur = conn.cursor()
-	cur.execute('''SELECT fecha,boton,temperature,current1,voltage1,current2,voltage2 FROM manual WHERE ID=(SELECT MAX(ID) FROM manual)''')
+	cur.execute('''SELECT fecha,boton_activ,boton_cancel,temperature,current1,voltage1,current2,voltage2 FROM manual WHERE ID=(SELECT MAX(ID) FROM manual)''')
 	pManual_monit = cur.fetchall()
 	for x in pManual_monit:
 		p_sistema['manual']['data']['fecha'] = x[0]
-		p_sistema['manual']['data']['boton'] = x[1]
-		p_sistema['manual']['data']['temperature'] = x[2]
-		p_sistema['manual']['data']['current1'] = x[3]
-		p_sistema['manual']['data']['voltage1'] = x[4]
-		p_sistema['manual']['data']['current2'] = x[5]
-		p_sistema['manual']['data']['voltage2'] = x[6]
+		p_sistema['manual']['data']['boton_activ'] = x[1]
+		p_sistema['manual']['data']['boton_cancel'] = x[2]
+		p_sistema['manual']['data']['temperature'] = x[3]
+		p_sistema['manual']['data']['current1'] = x[4]
+		p_sistema['manual']['data']['voltage1'] = x[5]
+		p_sistema['manual']['data']['current2'] = x[6]
+		p_sistema['manual']['data']['voltage2'] = x[7]
 	verificar_patron(mod = 'manual')
 
 def verificar_patron(mod):
@@ -201,6 +205,7 @@ def verificar_patron(mod):
 			p_sistema['rds']['type'] = "Error"
 			print("[!] Enviando reporte JSON a servidor web...")
 			sftp.envio(p_sistema['rds'],name="Error")
+			os.system("rm Error.json")
 	elif mod == 'manual':
 		if p_sistema['manual']['data']['fecha'] > (int(time.time()) -18010):
 			print("[+] Parámetros ",mod,": OK")
@@ -210,6 +215,7 @@ def verificar_patron(mod):
 			print(p_sistema['manual']['data']['fecha'])
 			print("[!] Enviando reporte JSON a servidor web...")
 			sftp.envio(p_sistema['manual'],name="Error")
+			os.system("rm Error.json")
 
 if __name__ == '__main__':
 	print("[+] Script controlador de activacion")
