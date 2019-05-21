@@ -49,7 +49,7 @@ def main():
 					except sqlite3.Error as e:
 						print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
 					else:
-						if mod[0] == '1':
+						if mod[0] == '1':	# Gabinete
 							reg.registers[1] /= 10.0
 							reg.registers[2] /= 10.0
 							reg.registers[3] /= 10.0
@@ -61,18 +61,33 @@ def main():
 								print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
 							conn.close()
 
-						elif mod[0] == '4':
-							reg.registers[0] /= 10.0
-							reg.registers[7] /= 10.0
-							reg.registers[8] /= 10.0
-							reg.registers[9] /= 10.0
-							reg.registers[10] /= 10.0
-							reg.registers[11] /= 10.0
+						elif mod[0] == '2':	# Controlador-Digital
+							for r in reg.registers:
+								r /= 10.0
 							try:
-								#print("\t└-[+] Conectando a la base de datos: resiliente.db")
-								#conn = sqlite3.connect('resiliente.db')
 								print("\t└-[+] Insertando registros en tabla: ",mod[1]['nombre'])
-								conn.execute('''INSERT INTO rds (frequency,lock,rds_state,state_2a,state_9a,state_11a,general_state,temperature,current1,voltage1,current2,voltage2) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)''', reg.registers)
+								conn.execute('''INSERT INTO controlador_digital (Temperatura,C_Fuente,V_Fuente,C_PoE,V_PoE,C_PreAmpli,V_PreAmpli,C_MUX,V_MUX,C_Raspberry,V_Raspberry,C_Rele,V_Rele,C_Switch,V_Switch,C_Ampli,V_Ampli) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',reg.registers)
+								conn.commit()
+							except sqlite3.Error as e:
+								print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
+							conn.close()
+
+						elif mod[0] == '3':	# Ampli-Izquierdo
+							for r in reg.registers:
+								r /= 10.0
+							try:
+								print("\t└-[+] Insertando registros en tabla: ",mod[1]['nombre'])
+								conn.execute('''INSERT INTO amp_izquierdo (temperatura,current_1,voltage_1,current_2,voltage_2) VALUES (?,?,?,?,?)''',reg.registers)
+								conn.commit()
+							except sqlite3.Error as e:
+								print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
+							conn.close()
+
+						elif mod[0] == '4':	# RDS
+							reg.registers[0] /= 10.0
+							try:
+								print("\t└-[+] Insertando registros en tabla: ",mod[1]['nombre'])
+								conn.execute('''INSERT INTO rds (frequency,lock,rds_state,state_2a,state_9a,state_11a,general_state) VALUES (?,?,?,?,?,?,?)''', reg.registers)
 								conn.commit()
 							except sqlite3.Error as e:
 								print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
@@ -80,7 +95,7 @@ def main():
 								conn.close()
 								if reg.registers[4] == 1 or reg.registers[5] == 1:
 									print("\t\t└--[!][!][!][!][!]******************** Intento de Activación - RDS ********************[!][!][!][!][!]")
-									act = client.read_holding_registers(mod[1]['monit_tamanio'],(86-mod[1]['monit_tamanio']),unit=int(mod[0]))
+									act = client.read_holding_registers(mod[1]['monit_tamanio'],74,unit=int(mod[0]))
 									if not act.isError():
 										print("\t\t\t└---[+] Registros Activacion via ",mod[1]['nombre'],": ",act.registers)
 										if primer_act == True:
@@ -91,13 +106,11 @@ def main():
 									else:
 										print("\t\t\t└---[!] No se pudo conseguir registros de Activacion ",mod[1]['nombre'])
 
-						elif mod[0] == '5':
+						elif mod[0] == '5':	# TDT
 							reg.registers[3] = str(reg.registers[3]) ##<- probar esta linea
 							try:
-								#print("\t└-[+] Conectando a la base de datos: resiliente.db")
-								#conn = sqlite3.connect('resiliente.db')
 								print("\t└-[+] Insertando registros en tabla: ",mod[1]['nombre'])
-								conn.execute('''INSERT INTO tdt (frecuencia,lock,bandwidth,area,flag_EWBS,flag_TMCC,temperatura,current_1,voltage_1,current_2,voltage_2) VALUES (?,?,?,?,?,?,?,?,?,?,?)''',reg.registers)
+								conn.execute('''INSERT INTO tdt (frequency,lock,bandwidth,area,flag_EWBS,flag_TMCC) VALUES (?,?,?,?,?,?)''',reg.registers)
 								conn.commit()
 							except sqlite3.Error as e:
 								print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
@@ -105,7 +118,7 @@ def main():
 								conn.close()
 								if reg.registers[4] == 1:
 									print("\t\t└--[!][!][!][!][!]******************** Intento de Activación - TDT ********************[!][!][!][!][!]")
-									act = client.read_holding_registers(mod[1]['monit_tamanio'],(86-mod[1]['monit_tamanio']),unit=int(mod[0]))
+									act = client.read_holding_registers(mod[1]['monit_tamanio'],74,unit=int(mod[0]))
 									if not act.isError():
 										print("\t\t\t└---[+] Registros Activacion via ",mod[1]['nombre'],": ",act.registers)
 										if primer_act == True:
@@ -116,18 +129,11 @@ def main():
 									else:
 										print("\t\t\t└---[!] No se pudo conseguir registros de Activacion ",mod[1]['nombre'])
 
-						elif mod[0] == '6':
+						elif mod[0] == '6':	# Manual
 							rtc_manual = formato_fecha(reg.registers)
-							reg.registers[8] /= 10.0
-							reg.registers[9] /= 10.0
-							reg.registers[10] /= 10.0
-							reg.registers[11] /= 10.0
-							reg.registers[12] /= 10.0
 							try:
-								#print("\t└-[+] Conectando a la base de datos: resiliente.db")
-								#conn = sqlite3.connect('resiliente.db')
 								print("\t└-[+] Insertando registros en tabla: ",mod[1]['nombre'])
-								conn.execute('''INSERT INTO manual (fecha,boton_activ,boton_cancel,temperature,current1,voltage1,current2,voltage2) VALUES (?,?,?,?,?,?,?,?)''',(rtc_manual,reg.registers[6],reg.registers[7],reg.registers[8],reg.registers[9],reg.registers[10],reg.registers[11],reg.registers[12]))
+								conn.execute('''INSERT INTO manual (fecha,boton_activ,boton_cancel) VALUES (?,?,?)''',(rtc_manual,reg.registers[6],reg.registers[7]))
 								conn.commit()
 							except sqlite3.Error as e:
 								print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
@@ -135,7 +141,7 @@ def main():
 								conn.close()
 								if reg.registers[6] == 1 or reg.registers[7] == 1:
 									print("\t\t└--[!][!][!][!][!]*****************Intento de Activación/Cancelador - MANUAL******************[!][!][!][!][!]")
-									act = client.read_holding_registers(mod[1]['monit_tamanio'], (87-mod[1]['monit_tamanio']), unit = int(mod[0]))
+									act = client.read_holding_registers(mod[1]['monit_tamanio'], 74, unit = int(mod[0]))
 									if not act.isError():
 										print("\t\t\t└---[+] Registros Activacion via ",mod[1]['nombre'],": ",act.registers)
 										if primer_act == True:
@@ -145,6 +151,51 @@ def main():
 											activ.activar(act.registers,int(mod[0]))
 									else:
 										print("\t\t\t└---[!] No se pudo conseguir registros de Activacion ",mod[1]['nombre'])
+
+						elif mod[0] == '7':	# Ampli-Derecho
+							for r in reg.regiters:
+								r /= 10.0
+							try:
+								print("\t└-[+] Insertando registros en tabla: ",mod[1]['nombre'])
+								conn.execute('''INSERT INTO amp_derecho (temperatura,current_1,voltage_1,current_2,voltage_2) VALUES (?,?,?,?,?)''',reg.registers)
+								conn.commit()
+							except sqlite3.Error as e:
+								print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
+							conn.close()
+
+						elif mod[0] == '8':	# RDS-Sensores
+							for r in reg.registers:
+								r /= 10.0
+							try:
+								print("\t└-[+] Insertando registros en tabla: ",mod[1]['nombre'])
+								conn.execute('''INSERT INTO rds_sensores (temperatura,current_1,voltage_1,current_2,voltage_2) VALUES (?,?,?,?,?)''',reg.registers)
+								conn.commit()
+							except sqlite3.Error as e:
+								print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
+							conn.close()
+
+						elif mod[0] == '9':	# TDT-Sensores
+							for r in reg.registers:
+								r /= 10.0
+							try:
+								print("\t└-[+] Insertando registros en tabla: ",mod[1]['nombre'])
+								conn.execute('''INSERT INTO tdt_sensores (temperatura,current_1,voltage_1,current_2,voltage_2) VALUES (?,?,?,?,?)''',reg.registers)
+								conn.commit()
+							except sqlite3.Error as e:
+								print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
+							conn.close()
+
+						elif mod[0] == '10':	# Manual-Sensores
+							for r in reg.registers:
+								r /= 10.0
+							try:
+								print("\t└-[+] Insertando registros en tabla: ",mod[1]['nombre'])
+								conn.execute('''INSERT INTO manual_sensores (temperatura,current_1,voltage_1,current_2,voltage_2) VALUES (?,?,?,?,?)''',reg.registers)
+								conn.commit()
+							except sqlite3.Error as e:
+								print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
+							conn.close()
+
 				else:
 					print("|-[!] Módulo ",mod[1]['nombre']," no responde!")
 	except KeyboardInterrupt:

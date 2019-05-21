@@ -4,8 +4,12 @@
             "monit_tamanio": 4,
             "nombre": "gabinete"
         },
+        "10": {
+            "monit_tamanio": 5,
+            "nombre": "manual - sensores"
+        },
         "2": {
-            "monit_tamanio": 7,
+            "monit_tamanio": 17,
             "nombre": "controlador_digital"
         },
         "3": {
@@ -13,20 +17,28 @@
             "nombre": "amplificador_izq"
         },
         "4": {
-            "monit_tamanio": 12,
+            "monit_tamanio": 7,
             "nombre": "rds"
         },
         "5": {
-            "monit_tamanio": 10,
+            "monit_tamanio": 6,
             "nombre": "tdt"
         },
         "6": {
-            "monit_tamanio": 13,
+            "monit_tamanio": 8,
             "nombre": "manual"
         },
         "7": {
             "monit_tamanio": 5,
             "nombre": "amplificador_der"
+        },
+        "8": {
+            "monit_tamanio": 5,
+            "nombre": "rds - sensores"
+        },
+        "9": {
+            "monit_tamanio": 5,
+            "nombre": "tdt - sensores"
         }
     },
     "puertos": {

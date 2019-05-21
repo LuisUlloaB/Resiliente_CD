@@ -1,7 +1,8 @@
 '''Disparador.py:
 			- Error en Monitoreo		[x]
-			- Notificacion de Activacion	[ ]
-			- Request/response Monitoreo	[ ]
+			- Notificacion de Activacion	[x]
+			- Request/response Monitoreo	[x]
+			- Adaptar a todos los modulos	[ ]
 '''
 import time
 import RPi.GPIO as gpio
@@ -21,8 +22,52 @@ t_mensaje = 0
 
 #parámetros del sistema
 p_sistema = {
+	'gabinete':{
+		'idname':"gabinete",
+		'type':"",
+		'data':{
+			'sensor_puerta':0,
+			'temperatura':0,
+			'battery_current':0,
+			'battery_voltage':0
+		}
+	},
+	'controlador_digital':{
+		'idname':"controlador_digital",
+		'type':"",
+		'data':{
+			'Temperatura':0,
+			'C_Fuente':0,
+			'V_Fuente':0,
+			'C_PoE':0,
+			'V_PoE':0,
+			'C_PreAmpli':0,
+			'V_PreAmpli':0,
+			'C_MUX':0,
+			'V_MUX':0,
+			'C_Raspberry':0,
+			'V_Raspberry':0,
+			'C_Rele':0,
+			'V_Rele':0,
+			'C_Switch':0,
+			'V_Switch':0,
+			'C_Ampli':0,
+			'V_Ampli':0
+		}
+	},
+	'amp_izquierdo':{
+		'idname':"amp_izquierdo",
+		'type':"",
+		'data':{
+			'temperatura':0,
+			'current_1':0,
+			'voltage_1':0,
+			'current_2':0,
+			'voltage_2':0
+		}
+	},
 	'rds':{
-		'idname': "rds",
+		'idname':"rds",
 		'type': "",
 		'data':{
 			'frequency':0,
@@ -31,12 +76,19 @@ p_sistema = {
 			'state_2a':0,
 			'state_9a':0,
 			'state_11a':0,
-			'general_state':0,
-			'temperature':0,
-			'current1':0,
-			'voltage1':0,
-			'current2':0,
-			'voltage2':0
+			'general_state':0
+		}
+	},
+	'tdt':{
+		'idname':"tdt",
+		'type':"",
+		'data':{
+			'frequency':0,
+			'lock':0,
+			'bandwidth':0,
+			'area':0,
+			'flag_EWBS':0,
+			'flag_TMCC':0
 		}
 	},
 	'manual':{
@@ -45,12 +97,51 @@ p_sistema = {
 		'data':{
 			'fecha':0,
 			'boton_activ':0,
-			'boton_cancel':0,
-			'temperature':0,
-			'current1':0,
-			'voltage1':0,
-			'current2':0,
-			'voltage2':0
+			'boton_cancel':0
+		}
+	},
+	'amp_derecho':{
+		'idname':"amp_derecho",
+		'type':"",
+		'data':{
+			'temperatura':0,
+			'current_1':0,
+			'voltage_1':0,
+			'current_2':0,
+			'voltage_2':0
+		}
+	},
+	'rds_sensores':{
+		'idname':"rds_sensores",
+		'type':"",
+		'data':{
+			'temperatura':0,
+			'current_1':0,
+			'voltage_1':0,
+			'current_2':0,
+			'voltage_2':0
+		}
+	},
+	'tdt_sensores':{
+		'idname':"tdt_sensores",
+		'type':"",
+		'data':{
+			'temperatura':0,
+			'current_1':0,
+			'voltage_1':0,
+			'current_2':0,
+			'voltage_2':0
+		}
+	},
+	'manual_sensores':{
+		'idname':"manual_sensores",
+		'type':"",
+		'data':{
+			'temperatura':0,
+			'current_1':0,
+			'voltage_1':0,
+			'current_2':0,
+			'voltage_2':0
 		}
 	}
 }
@@ -106,9 +197,10 @@ def activ_request(conn):
 				'urgencia':p_act["data"]["urgencia"],
 				'mensaje':p_act["data"]["tipo_mensaje"],
 			}
-			print("[+] Generando fichero de audio 'audio_param.json' ")
-			with open('audio_param.json','w') as file:
-				json.dump(var_audio,file,indent=4)
+			if p_act["data"]["tipo_mensaje"] != "cancela":
+				print("[+] Generando fichero de audio 'audio_param.json' ")
+				with open('audio_param.json','w') as file:
+					json.dump(var_audio,file,indent=4)
 			os.system('rm Activation.json')
 	except FileNotFoundError:
 		print("[!] No existe activacion via web")
@@ -122,11 +214,14 @@ def monit_request_response():
 			flag = {
 				'gabinete':False,
 				'controlador_digital':False,
-				'amplificador_izq':False,
+				'amp_izquierdo':False,
 				'rds':False,
 				'tdt':False,
 				'manual':False,
-				'amplificador_der':False
+				'amp_derecho':False,
+				'rds_sensores':False,
+				'tdt_sensores':False,
+				'manual_sensores':False
 			}
 			if rq['type'] == "Request":
 				for m in rq['modules']:
@@ -159,7 +254,7 @@ def get_monit_rds(conn):
 	global p_sistema
 	print("[+] Extrayendo parámetros de monitoreo 'rds'")
 	cur = conn.cursor()
-	cur.execute('''SELECT frequency,lock,rds_state,state_2a,state_9a,state_11a,general_state,temperature,current1,voltage1,current2,voltage2 FROM rds WHERE ID=(SELECT MAX(ID) FROM rds)''')
+	cur.execute('''SELECT frequency,lock,rds_state,state_2a,state_9a,state_11a,general_state FROM rds WHERE ID=(SELECT MAX(ID) FROM rds)''')
 	pRDS_monit = cur.fetchall()
 	for x in pRDS_monit:
 		p_sistema['rds']['data']['frequency'] = x[0]
@@ -169,28 +264,18 @@ def get_monit_rds(conn):
 		p_sistema['rds']['data']['state_9a'] = x[4]
 		p_sistema['rds']['data']['state_11a'] = x[5]
 		p_sistema['rds']['data']['general_state'] = x[6]
-		p_sistema['rds']['data']['temperature'] = x[7]
-		p_sistema['rds']['data']['current1'] = x[8]
-		p_sistema['rds']['data']['voltage1'] = x[9]
-		p_sistema['rds']['data']['current2'] = x[10]
-		p_sistema['rds']['data']['voltage2'] = x[11]
 	verificar_patron(mod = 'rds')
 
 def get_monit_manual(conn):
 	global p_sistema
 	print("[+] Extrayendo parámetros de monitoreo 'manual'")
 	cur = conn.cursor()
-	cur.execute('''SELECT fecha,boton_activ,boton_cancel,temperature,current1,voltage1,current2,voltage2 FROM manual WHERE ID=(SELECT MAX(ID) FROM manual)''')
+	cur.execute('''SELECT fecha,boton_activ,boton_cancel FROM manual WHERE ID=(SELECT MAX(ID) FROM manual)''')
 	pManual_monit = cur.fetchall()
 	for x in pManual_monit:
 		p_sistema['manual']['data']['fecha'] = x[0]
 		p_sistema['manual']['data']['boton_activ'] = x[1]
 		p_sistema['manual']['data']['boton_cancel'] = x[2]
-		p_sistema['manual']['data']['temperature'] = x[3]
-		p_sistema['manual']['data']['current1'] = x[4]
-		p_sistema['manual']['data']['voltage1'] = x[5]
-		p_sistema['manual']['data']['current2'] = x[6]
-		p_sistema['manual']['data']['voltage2'] = x[7]
 	verificar_patron(mod = 'manual')
 
 def verificar_patron(mod):
@@ -207,7 +292,7 @@ def verificar_patron(mod):
 			sftp.envio(p_sistema['rds'],name="Error")
 			os.system("rm Error.json")
 	elif mod == 'manual':
-		if p_sistema['manual']['data']['fecha'] > (int(time.time()) -18010):
+		if p_sistema['manual']['data']['fecha'] > (int(time.time()) -18015):
 			print("[+] Parámetros ",mod,": OK")
 		else:
 			print("[!] Parámetros ",mod,": Error")
