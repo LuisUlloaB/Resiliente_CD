@@ -278,6 +278,131 @@ def get_monit_manual(conn):
 		p_sistema['manual']['data']['boton_cancel'] = x[2]
 	verificar_patron(mod = 'manual')
 
+def get_monit_tdt(conn):
+	global p_sistema
+	print("[+] Extrayendo parámetros de monitoreo 'tdt'")
+	cur = conn.cursor()
+	cur.execute('''SELECT frequency,lock,bandwidth,area,flag_EWBS,flag_TMCC FROM tdt WHERE ID=(SELECT MAX(ID) FROM tdt)''')
+	pTDT_monit = cur.fetchall()
+	for x in pTDT_monit:
+		p_sistema['tdt']['data']['frequency'] = x[0]
+		p_sistema['tdt']['data']['lock'] = x[1]
+		p_sistema['tdt']['data']['bandwidth'] = x[2]
+		p_sistema['tdt']['data']['area'] = x[3]
+		p_sistema['tdt']['data']['flag_EWBS'] = x[4]
+		p_sistema['tdt']['data']['flag_TMCC'] = x[5]
+	verificar_patron(mod = 'tdt')
+
+def get_monit_gabinete(conn):
+	global p_sistema
+	print("[+] Extrayendo parámetros de monitoreo 'gabinete'")
+	cur = conn.cursor()
+	cur.execute('''SELECT sensor_puerta,temperatura,battery_current,battery_voltage FROM gabinete WHERE ID=(SELECT MAX(ID) FROM gabinete)''')
+	pGabinete_monit = cur.fetchall()
+	for x in pGabinete_monit:
+		p_sistema['gabinete']['data']['sensor_puerta'] = x[0]
+		p_sistema['gabinete']['data']['temperatura'] = x[1]
+		p_sistema['gabinete']['data']['battery_current'] = x[2]
+		p_sistema['gabinete']['data']['battery_voltage'] = x[3]
+	verificar_patron(mod = 'gabinete')
+
+def get_monit_controlador_digital(conn):
+	global p_sistema
+	print("[+] Extrayendo parámetros de monitoreo 'controlador_digital'")
+	cur = conn.cursor()
+	cur.execute('''SELECT Temperatura,C_Fuente,V_Fuente,C_PoE,V_PoE,C_PreAmpli,V_PreAmpli,C_MUX,V_MUX,C_Raspberry,V_Raspberry,C_Rele,V_Rele,
+			C_Switch,V_Switch,C_Ampli,V_Ampli FROM controlador_digital WHERE ID=(SELECT MAX(ID) FROM controlador_digital)''')
+	pControlador_monit = cur.fetchall()
+	for x in pControlador_monit:
+		p_sistema['controlador_digital']['data']['Temperatura'] = x[0]
+		p_sistema['controlador_digital']['data']['C_Fuente'] = x[1]
+		p_sistema['controlador_digital']['data']['V_Fuente'] = x[2]
+		p_sistema['controlador_digital']['data']['C_PoE'] = x[3]
+		p_sistema['controlador_digital']['data']['V_PoE'] = x[4]
+		p_sistema['controlador_digital']['data']['C_PreAmpli'] = x[5]
+		p_sistema['controlador_digital']['data']['V_PreAmpli'] = x[6]
+		p_sistema['controlador_digital']['data']['C_MUX'] = x[7]
+		p_sistema['controlador_digital']['data']['V_MUX'] = x[8]
+		p_sistema['controlador_digital']['data']['C_Raspberry'] = x[9]
+		p_sistema['controlador_digital']['data']['V_Raspberry'] = x[10]
+		p_sistema['controlador_digital']['data']['C_Rele'] = x[11]
+		p_sistema['controlador_digital']['data']['V_Rele'] = x[12]
+		p_sistema['controlador_digital']['data']['C_Switch'] = x[13]
+		p_sistema['controlador_digital']['data']['V_Switch'] = x[14]
+		p_sistema['controlador_digital']['data']['C_Ampli'] = x[15]
+		p_sistema['controlador_digital']['data']['V_Ampli'] = x[16]
+	verificar_patron(mod = 'controlador_digital')
+
+def get_monit_amp_derecho(conn):
+	global p_sistema
+	print("[+] Extrayendo parámetros de monitoreo 'amp_derecho'")
+	cur = conn.cursor()
+	cur.execute('''SELECT temperatura,current_1,voltage_1,current_2,voltage_2 FROM amp_derecho WHERE ID=(SELECT MAX(ID) FROM amp_derecho)''')
+	pAmp_derecho_monit = cur.fetchall()
+	for x in pAmp_derecho_monit:
+		p_sistema['amp_derecho']['data']['temperatura'] = x[0]
+		p_sistema['amp_derecho']['data']['current_1'] = x[1]
+		p_sistema['amp_derecho']['data']['voltage_1'] = x[2]
+		p_sistema['amp_derecho']['data']['current_2'] = x[3]
+		p_sistema['amp_derecho']['data']['voltage_2'] = x[4]
+	verificar_patron(mod = 'amp_derecho')
+
+def get_monit_amp_izquierdo(conn):
+	global p_sistema
+	print("[+] Extrayendo parámetros de monitoreo 'amp_izquierdo'")
+	cur = conn.cursor()
+	cur.execute('''SELECT temperatura,current_1,voltage_1,current_2,voltage_2 FROM amp_izquierdo WHERE ID=(SELECT MAX(ID) FROM amp_izquierdo)''')
+	pAmp_izquierdo_monit = cur.fetchall()
+	for x in pAmp_izquierdo_monit:
+		p_sistema['amp_izquierdo']['data']['temperatura'] = x[0]
+		p_sistema['amp_izquierdo']['data']['current_1'] = x[1]
+		p_sistema['amp_izquierdo']['data']['voltage_1'] = x[2]
+		p_sistema['amp_izquierdo']['data']['current_2'] = x[3]
+		p_sistema['amp_izquierdo']['data']['voltage_2'] = x[4]
+	verificar_patron(mod = 'amp_izquierdo')
+
+def get_monit_rds_sensores(conn):
+	global p_sistema
+	print("[+] Extrayendo parámetros de monitoreo 'rds_sensores'")
+	cur = conn.cursor()
+	cur.execute('''SELECT temperatura,current_1,voltage_1,current_2,voltage_2 FROM rds_sensores WHERE ID=(SELECT MAX(ID) FROM rds_sensores)''')
+	pRDS_sensores_monit = cur.fetchall()
+	for x in pRDS_sensores_monit:
+		p_sistema['rds_sensores']['data']['temperatura'] = x[0]
+		p_sistema['rds_sensores']['data']['current_1'] = x[1]
+		p_sistema['rds_sensores']['data']['voltage_1'] = x[2]
+		p_sistema['rds_sensores']['data']['current_2'] = x[3]
+		p_sistema['rds_sensores']['data']['voltage_2'] = x[4]
+	verificar_patron(mod = 'rds_sensores')
+
+def get_monit_tdt_sensores(conn):
+	global p_sistema
+	print("[+] Extrayendo parámetros de monitoreo 'tdt_sensores'")
+	cur = conn.cursor()
+	cur.execute('''SELECT temperatura,current_1,voltage_1,current_2,voltage_2 FROM tdt_sensores WHERE ID=(SELECT MAX(ID) FROM tdt_sensores)''')
+	pTDT_sensores_monit = cur.fetchall()
+	for x in pTDT_sensores_monit:
+		p_sistema['tdt_sensores']['data']['temperatura'] = x[0]
+		p_sistema['tdt_sensores']['data']['current_1'] = x[1]
+		p_sistema['tdt_sensores']['data']['voltage_1'] = x[2]
+		p_sistema['tdt_sensores']['data']['current_2'] = x[3]
+		p_sistema['tdt_sensores']['data']['voltage_2'] = x[4]
+	verificar_patron(mod = 'tdt_sensores')
+
+def get_monit_manual_sensores(conn):
+	global p_sistema
+	print("[+] Extrayendo parámetros de monitoreo 'manual_sensores'")
+	cur = conn.cursor()
+	cur.execute('''SELECT temperatura,current_1,voltage_1,current_2,voltage_2 FROM manual_sensores WHERE ID=(SELECT MAX(ID) FROM manual_sensores)''')
+	pTDT_sensores_monit = cur.fetchall()
+	for x in pTDT_sensores_monit:
+		p_sistema['manual_sensores']['data']['temperatura'] = x[0]
+		p_sistema['manual_sensores']['data']['current_1'] = x[1]
+		p_sistema['manual_sensores']['data']['voltage_1'] = x[2]
+		p_sistema['manual_sensores']['data']['current_2'] = x[3]
+		p_sistema['manual_sensores']['data']['voltage_2'] = x[4]
+	verificar_patron(mod = 'manual_sensores')
+
 def verificar_patron(mod):
 	global p_sistema
 	print('[*] Verificando datos: monitoreo ',mod)
