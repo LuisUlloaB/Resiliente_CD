@@ -12,13 +12,15 @@ import json
 import os
 gpio.setmode(gpio.BCM)
 gpio.setwarnings(False)
-gpio.setup(23, gpio.OUT, initial=0)
+gpio.setup(13, gpio.OUT, initial=0)
+gpio.setup(12, gpio.OUT, initial=0)
 
 #Activacion
 inicio = 0
 final = 0
 audio_param = 0
 t_mensaje = 0
+ip_controlador = 0
 
 #parámetros del sistema
 p_sistema = {
@@ -88,7 +90,8 @@ p_sistema = {
 			'bandwidth':0,
 			'area':0,
 			'flag_EWBS':0,
-			'flag_TMCC':0
+			'flag_TMCC':0,
+			'power':0
 		}
 	},
 	'manual':{
@@ -143,13 +146,35 @@ p_sistema = {
 			'current_2':0,
 			'voltage_2':0
 		}
+	},
+	'bocina_der':{
+		'idname':"bocina_der",
+		'type':"",
+		'data':{
+			'out_current_speaker':0,
+			'in_voltage_audio':0,
+			'enable_ampli':0
+		}
+	},
+	'bocina_izq':{
+		'idname':"bocina_izq",
+		'type':"",
+		'data':{
+			'out_current_speaker':0,
+			'in_voltage_audio':0,
+			'enable_ampli':0
+		}
 	}
 }
 #sorted(p_sistema.items())
 
 def main():
+	global ip_controlador
 	while True:
 		try:
+			with open('/home/pi/Resiliente_CD/config/config.json','r') as cfg:
+				conf = json.load(cfg)
+				ip_controlador = conf['ip']
 			print("[+] Conectando a la base de datos: resiliente.db")
 			conn = sqlite3.connect('resiliente.db')
 			get_activ(conn)
@@ -166,11 +191,13 @@ def main():
 		print("--> Epoch de inicio: "+str(inicio))
 		print("--> Epoch de fin: "+str(final))
 		if (int(time.time()) - 18000) >= int(inicio) and (int(time.time()) - 18000) <= int(final) and t_mensaje != "cancela":
-			gpio.output(23,1)
+			gpio.output(13,1)
+			gpio.output(12,1)
 			d = int(final) - (int(time.time()) - 18000)
 			print("Duración: "+str(d)+" segundos")
 		else:
-			gpio.output(23,0)
+			gpio.output(13,0)
+			gpio.output(12,0)
 		conn.close()
 		time.sleep(1)
 
@@ -207,6 +234,7 @@ def activ_request(conn):
 
 def monit_request_response():
 	#verificar request de monitoreo y responder
+	global ip_controlador
 	try:
 		with open('/home/pi/Resiliente_CD/Request.json','r') as f_rq:
 			print("[+] Existe solicitud de monitoreo")
@@ -221,13 +249,16 @@ def monit_request_response():
 				'amp_derecho':False,
 				'rds_sensores':False,
 				'tdt_sensores':False,
-				'manual_sensores':False
+				'manual_sensores':False,
+				'bocina_der':False,
+				'bocina_izq':False
 			}
 			if rq['type'] == "Request":
 				for m in rq['modules']:
 					flag[m] = True
 				re = {
-					'type':"Response"
+					'type':"Response",
+					'ip':ip_controlador
 				}
 				for f in flag.items():
 					if f[1] == True:
@@ -282,7 +313,7 @@ def get_monit_tdt(conn):
 	global p_sistema
 	print("[+] Extrayendo parámetros de monitoreo 'tdt'")
 	cur = conn.cursor()
-	cur.execute('''SELECT frequency,lock,bandwidth,area,flag_EWBS,flag_TMCC FROM tdt WHERE ID=(SELECT MAX(ID) FROM tdt)''')
+	cur.execute('''SELECT frequency,lock,bandwidth,area,flag_EWBS,flag_TMCC,power FROM tdt WHERE ID=(SELECT MAX(ID) FROM tdt)''')
 	pTDT_monit = cur.fetchall()
 	for x in pTDT_monit:
 		p_sistema['tdt']['data']['frequency'] = x[0]
@@ -291,6 +322,7 @@ def get_monit_tdt(conn):
 		p_sistema['tdt']['data']['area'] = x[3]
 		p_sistema['tdt']['data']['flag_EWBS'] = x[4]
 		p_sistema['tdt']['data']['flag_TMCC'] = x[5]
+		p_sistema['tdt']['data']['power'] = x[6]
 	verificar_patron(mod = 'tdt')
 
 def get_monit_gabinete(conn):
@@ -403,16 +435,41 @@ def get_monit_manual_sensores(conn):
 		p_sistema['manual_sensores']['data']['voltage_2'] = x[4]
 	verificar_patron(mod = 'manual_sensores')
 
-def verificar_patron(mod):
+def get_monit_bocina_der(conn):
 	global p_sistema
+	print("[+] Extrayendo parámetros de monitoreo 'bocina_der'")
+	cur = conn.cursor()
+	cur.execute('''SELECT out_current_speaker,in_voltage_audio,enable_ampli FROM bocina_der WHERE ID=(SELECT MAX(ID) FROM bocina_der)''')
+	pBocina_der_monit = cur.fetchall()
+	for x in pBocina_der_monit:
+		p_sistema['bocina_der']['data']['out_current_speaker'] = x[0]
+		p_sistema['bocina_der']['data']['in_voltage_audio'] = x[1]
+		p_sistema['bocina_der']['data']['enable_ampli'] = x[2]
+	verificar_patron(mod = 'bocina_der')
+
+def get_monit_bocina_izq(conn):
+	global p_sistema
+	print("[+] Extrayendo parámetros de monitoreo 'bocina_izq'")
+	cur = conn.cursor()
+	cur.execute('''SELECT out_current_speaker,in_voltage_audio,enable_ampli FROM bocina_izq WHERE ID=(SELECT MAX(ID) FROM bocina_izq)''')
+	pBocina_izq_monit = cur.fetchall()
+	for x in pBocina_izq_monit:
+		p_sistema['bocina_izq']['data']['out_current_speaker'] = x[0]
+		p_sistema['bocina_izq']['data']['in_voltage_audio'] = x[1]
+		p_sistema['bocina_izq']['data']['enable_ampli'] = x[2]
+	verificar_patron(mod = 'bocina_izq')
+
+def verificar_patron(mod):
+	global p_sistema, ip_controlador
 	print('[*] Verificando datos: monitoreo ',mod)
 	if mod == 'rds':
 		#p_rds['rds']['frequency']=99.9 # Error (para fines de prueba)
-		if (p_sistema['rds']['data']['frequency'] == 107.9 or p_sistema['rds']['data']['frequency'] == 92.5) and p_sistema['rds']['data']['lock'] == 1:
+		if (p_sistema['rds']['data']['frequency'] == 107.9 or p_sistema['rds']['data']['frequency'] == 92.5) and p_sistema['rds']['data']['lock'] == 1 and p_sistema['rds']['data']['rds_state'] == 1:
 			print("[+] Parámetros ",mod,": OK")
 		else:
 			print("[!] Parámetros ",mod,": Error")
 			p_sistema['rds']['type'] = "Error"
+			p_sistema['rds']['ip'] = ip_controlador
 			print("[!] Enviando reporte JSON a servidor web...")
 			sftp.envio(p_sistema['rds'],name="Error")
 			os.system("rm Error.json")
@@ -422,10 +479,31 @@ def verificar_patron(mod):
 		else:
 			print("[!] Parámetros ",mod,": Error")
 			p_sistema['manual']['type'] = "Error"
+			p_sistema['manual']['ip'] = ip_controlador
 			print(p_sistema['manual']['data']['fecha'])
 			print("[!] Enviando reporte JSON a servidor web...")
 			sftp.envio(p_sistema['manual'],name="Error")
 			os.system("rm Error.json")
+	elif mod == 'tdt':
+		if p_sistema['tdt']['data']['frequency'] == 485.142 and p_sistema['tdt']['data']['lock'] == 1 and p_sistema['tdt']['data']['bandwidth'] == 6 and p_sistema['tdt']['data']['power'] == 60:
+			print("[+] Parámetros ",mod,": OK")
+		else:
+			print("[!] Parámetros ",mod,": Error")
+			p_sistema['tdt']['type'] = "Error"
+			p_sistema['tdt']['ip'] = ip_controlador
+			print("[!] Enviando reporte JSON a servidor web...")
+			sftp.envio(p_sistema['tdt'],name="Error")
+			os.system("rm Error.json")
+	elif mod == 'gabinete':
+		if p_sistema['gabinete']['data']['sensor_puerta'] == 1 and (p_sistema['gabinete']['data']['temperatura'] < 75.0 and p_sistema['gabinete']['data']['temperatura'] > -20.0) and p_sistema['gabinete']['data']['battery_current'] > 0 and (p_sistema['gabinete']['data']['battery_voltage'] < 12.5 and p_sistema['gabinete']['data']['battery_voltage'] > 10.5):
+			print("[+] Parámetros ",mod,": OK")
+		else:
+			print("[!] Parámetros ",mod,": Error")
+			p_sistema['gabinete']['type'] = "Error"
+			p_sistema['gabinete']['ip'] = ip_controlador
+			print("[!] Enviando reporte JSON a servidor web...")
+			sftp.envio(p_sistema['gabinete'],name="Error")
+			os.systema("rm Error.json")
 
 if __name__ == '__main__':
 	print("[+] Script controlador de activacion")

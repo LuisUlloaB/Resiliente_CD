@@ -1,4 +1,5 @@
 {
+    "ip": "10.0.114.27",
     "modulos": {
         "1": {
             "monit_tamanio": 4,
@@ -7,6 +8,14 @@
         "10": {
             "monit_tamanio": 5,
             "nombre": "manual - sensores"
+        },
+        "11": {
+            "monit_tamanio": 3,
+            "nombre": "bocina_der"
+        },
+        "12": {
+            "monit_tamanio": 3,
+            "nombre": "bocina_izq"
         },
         "2": {
             "monit_tamanio": 17,
