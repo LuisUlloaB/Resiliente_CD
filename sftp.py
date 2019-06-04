@@ -30,3 +30,17 @@ def envio(parametros,name='datos'):
 		#enlistar archivos
 		#for attr in directory_structure:
 		#	print(attr.filename, attr)
+
+def bck_db(name):
+	ip = "10.0.114.14"
+	user = "usuario"
+	password = "inicteluni"
+	#with open('/home/pi/Resiliente_CD/config/config.json','r') as cfg:
+		#serv = json.load(cfg)
+		#ip = serv['servidor']['ip']
+		#user = serv['servidor']['user']
+		#password = serv['servidor']['password']
+	with pysftp.Connection(host=ip, username=user, password=password) as sftp:
+		localFilePath = '/home/pi/Resiliente_CD/csv/'+name+'.csv'
+		remoteFilePath = '/home/usuario/Escritorio/'+name+'.csv'
+		sftp.put(localFilePath, remoteFilePath)

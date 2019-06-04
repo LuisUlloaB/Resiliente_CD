@@ -182,6 +182,8 @@ def main():
 			get_activ(conn)
 			get_monit_manual(conn)
 			get_activ(conn)
+			if int( time.strftime("%H", time.localtime()) ) % 4 == 0:
+				backup_db(conn)
 		except sqlite3.Error as e:
 			print("[!] Sqlite3 error, ID: ",e.args[0])
 		monit_request_response() #Funcion para verificar solicitud-monit de web
@@ -200,6 +202,20 @@ def main():
 			gpio.output(12,0)
 		conn.close()
 		time.sleep(1)
+
+def backup_db(conn):
+	tablas = ["activacion","controlador_digital","rds_sensores","amp_derecho",
+			"gabinete","tdt","amp_izquierdo","manual","tdt_sensores",
+			"bocina_der","manual_sensores","bocina_izq","rds"]
+	for t in tablas:
+		with open(("./csv/"+t+".csv"),"wb") as f:
+			cursor = conn.cursor()
+			for row in cursor.execute("SELECT * FROM "+t):
+				writeRow = ",".join([str(i) for i in row])
+				writeRow += "\n"
+				f.write(writeRow.encode())
+	for t in tablas:
+		sftp.bck_db(t)
 
 def activ_request(conn):
 	try:
@@ -495,7 +511,9 @@ def verificar_patron(mod):
 			sftp.envio(p_sistema['tdt'],name="Error")
 			os.system("rm Error.json")
 	elif mod == 'gabinete':
-		if p_sistema['gabinete']['data']['sensor_puerta'] == 1 and (p_sistema['gabinete']['data']['temperatura'] < 75.0 and p_sistema['gabinete']['data']['temperatura'] > -20.0) and p_sistema['gabinete']['data']['battery_current'] > 0 and (p_sistema['gabinete']['data']['battery_voltage'] < 12.5 and p_sistema['gabinete']['data']['battery_voltage'] > 10.5):
+		if (p_sistema['gabinete']['data']['sensor_puerta'] == 1 and (p_sistema['gabinete']['data']['temperatura'] < 75.0
+			and p_sistema['gabinete']['data']['temperatura'] > -20.0) and p_sistema['gabinete']['data']['battery_current'] > 0
+			and (p_sistema['gabinete']['data']['battery_voltage'] < 12.5 and p_sistema['gabinete']['data']['battery_voltage'] > 10.5)):
 			print("[+] Parámetros ",mod,": OK")
 		else:
 			print("[!] Parámetros ",mod,": Error")
@@ -503,7 +521,62 @@ def verificar_patron(mod):
 			p_sistema['gabinete']['ip'] = ip_controlador
 			print("[!] Enviando reporte JSON a servidor web...")
 			sftp.envio(p_sistema['gabinete'],name="Error")
-			os.systema("rm Error.json")
+			os.system("rm Error.json")
+	elif mod == 'amp_izquierdo':
+		if p_sistema['amp_izquierdo']['data']['temperatura'] < 75.0 and p_sistema['amp_izquierdo']['data']['temperatura'] > -20.0:
+			print("[+] Parámetros ",mod,": OK")
+		else:
+			print("[!] Parámetros ",mod,": Error")
+			p_sistema['amp_izquierdo']['type'] = "Error"
+			p_sistema['amp_izquierdo']['ip'] = ip_controlador
+			print("[!] Enviando reporte JSON a servidor web...")
+			sftp.envio(p_sistema['amp_izquierdo'],name="Error")
+			os.system("rm Error.json")
+	elif mod == 'amp_derecho':
+		if p_sistema['amp_derecho']['data']['temperatura'] < 75.0 and p_sistema['amp_derecho']['data']['temperatura'] > -20.0:
+			print("[+] Parámetros ",mod,": OK")
+		else:
+			print("[!] Parámetros ",mod,": Error")
+			p_sistema['amp_derecho']['type'] = "Error"
+			p_sistema['amp_derecho']['ip'] = ip_controlador
+			print("[!] Enviando reporte JSON a servidor web...")
+			sftp.envio(p_sistema['amp_derecho'],name="Error")
+			os.system("rm Error.json")
+	elif mod == 'rds_sensores':
+		if p_sistema['rds_sensores']['data']['temperatura'] < 75.0 and p_sistema['rds_sensores']['data']['temperatura'] > -20.0:
+			print("[+] Parámetros ",mod,": OK")
+		else:
+			print("[!] Parámetros ",mod,": Error")
+			p_sistema['rds_sensores']['type'] = "Error"
+			p_sistema['rds_sensores']['ip'] = ip_controlador
+			print("[!] Enviando reporte JSON a servidor web...")
+			sftp.envio(p_sistema['rds_sensores'],name="Error")
+			os.system("rm Error.json")
+	elif mod == 'tdt_sensores':
+		if p_sistema['tdt_sensores']['data']['temperatura'] < 75.0 and p_sistema['tdt_sensores']['data']['temperatura'] > -20.0:
+			print("[+] Parámetros ",mod,": OK")
+		else:
+			print("[!] Parámetros ",mod,": Error")
+			p_sistema['tdt_sensores']['type'] = "Error"
+			p_sistema['tdt_sensores']['ip'] = ip_controlador
+			print("[!] Enviando reporte JSON a servidor web...")
+			sftp.envio(p_sistema['tdt_sensores'],name="Error")
+			os.system("rm Error.json")
+	elif mod == 'manual_sensores':
+		if p_sistema['manual_sensores']['data']['temperatura'] < 75.0 and p_sistema['manual_sensores']['data']['temperatura'] > -20.0:
+			print("[+] Parámetros ",mod,": OK")
+		else:
+			print("[!] Parámetros ",mod,": Error")
+			p_sistema['manual_sensores']['type'] = "Error"
+			p_sistema['manual_sensores']['ip'] = ip_controlador
+			print("[!] Enviando reporte JSON a servidor web...")
+			sftp.envio(p_sistema['manual_sensores'],name="Error")
+			os.system("rm Error.json")
+	#elif mod == 'controlador_digital':
+	#	if (p_sistema['controlador_digital']['data']['Temperatura'] < 75.0 and p_sistema['controlador_digital']['data']['Temperatura'] > -20.0)
+	#		and (p_sistema['controlador_digital']['data']['C_PoE'] < 6.0 and p_sistema['controlador_digital']['data']['C_PoE'] > 0.5)
+	#		and (p_sistema['controlador_digital']['data']['V_PoE'] < 24.5 and p_sistema['controlador_digital']['data']['V_PoE'] > 23.5)
+	#		and (p_sistema['controlador_digital']['data']['C_PreAmpli'] < 1.0 and p_sistema['controlador_digital']['data']['C_PreAmpli'] > 0) 
 
 if __name__ == '__main__':
 	print("[+] Script controlador de activacion")
