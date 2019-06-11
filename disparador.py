@@ -1,5 +1,5 @@
 '''Disparador.py:
-			- Error en Monitoreo			[x]
+			- Error en Monitoreo		[x]
 			- Notificacion de Activacion	[x]
 			- Request/response Monitoreo	[x]
 			- Adaptar a todos los modulos	[x]
@@ -411,6 +411,7 @@ def verificar_patron(mod):
 	with open('config/config.json','r') as cmp:
 		config = json.load(cmp)
 		modulos = config["modulos"]
+		err = {}
 		for m in sorted(modulos.items()):
 			err[m[1]["nombre"]] = m[1]["error"]
 
@@ -432,7 +433,7 @@ def verificar_patron(mod):
 			os.system("rm Error.json")
 
 	elif mod == 'manual':
-		if p_sistema['manual']['data']['fecha'] > (int(time.time()) - 18000 - err["manual"]["timestamp"]):
+		if int(p_sistema['manual']['data']['fecha']) > int(time.time()) - 18000 - err["manual"]["timestamp"]:
 			print("[+] Parámetros ",mod,": OK")
 		else:
 			print("[!] Parámetros ",mod,": Error")
