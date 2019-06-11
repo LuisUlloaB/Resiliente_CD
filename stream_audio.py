@@ -41,11 +41,11 @@ def audio_gen(estado):
 	global p_audio, slaveID
 	print(p_audio)
 	x = ['audios/'+p_audio['estado']+'.wav','audios/'+p_audio['evento']+'.wav','audios/'+p_audio['severidad']+'.wav','audios/'+p_audio['respuesta']+'.wav','audios/'+p_audio['urgencia']+'.wav']
-	fixed_audios = ["audios/alerta_crecidaRio_evacuar_inmediata.wav",
-			"audios/alerta_crecidaRio_extremo_evacuar_inmediata.wav",
+	fixed_audios = ["audios/alerta_crecidario_evacuar_inmediata.wav",
+			"audios/alerta_crecidario_extremo_evacuar_inmediata.wav",
 			"audios/alerta_sismo_extremo_evacuar_inmediata.wav",
 			"audios/alerta_tsunami_extremo_evacuar_inmediata.wav",
-			"audios/simulacro_crecidaRio_extremo_evacuar_inmediata.wav",
+			"audios/simulacro_crecidario_extremo_evacuar_inmediata.wav",
 			"audios/simulacro_inundacion_extremo_evacuar_inmediata.wav",
 			"audios/simulacro_sismo_extremo_evacuar_inmediata.wav",
 			"audios/simulacro_tsunami_extremo_evacuar_inmediata.wav"]
@@ -53,13 +53,13 @@ def audio_gen(estado):
 	player = instance.media_player_new()
 	player.audio_set_volume(250)
 	if estado == True:
-		if p_audio['estado'] == 'actual' and p_audio['evento'] == 'crecidaRio' and p_audio['respuesta'] == 'evacuar' and p_audio['severidad'] != 'extremo' and p_audio['urgencia'] == 'inmediato':
+		if p_audio['estado'] == 'actual' and p_audio['evento'] == 'crecidario' and p_audio['respuesta'] == 'evacuar' and p_audio['severidad'] != 'extremo' and p_audio['urgencia'] == 'inmediato':
 			media = instance.media_new(fixed_audios[0])
 			player.set_media(media)
 			player.play()
 			while player.get_state() != vlc.State.Ended:
 				time.sleep(1)
-		elif p_audio['estado'] == 'actual' and p_audio['evento'] == 'crecidaRio' and p_audio['respuesta'] == 'evacuar' and p_audio['severidad'] == 'extremo' and p_audio['urgencia'] == 'inmediato':
+		elif p_audio['estado'] == 'actual' and p_audio['evento'] == 'crecidario' and p_audio['respuesta'] == 'evacuar' and p_audio['severidad'] == 'extremo' and p_audio['urgencia'] == 'inmediato':
 			media = instance.media_new(fixed_audios[1])
 			player.set_media(media)
 			player.play()
@@ -77,7 +77,7 @@ def audio_gen(estado):
 			player.play()
 			while player.get_state() != vlc.State.Ended:
 				time.sleep(1)
-		elif p_audio['estado'] == 'simulacro' and p_audio['evento'] == 'crecidaRio' and p_audio['respuesta'] == 'evacuar' and p_audio['severidad'] == 'extremo' and p_audio['urgencia'] == 'inmediato':
+		elif p_audio['estado'] == 'simulacro' and p_audio['evento'] == 'crecidario' and p_audio['respuesta'] == 'evacuar' and p_audio['severidad'] == 'extremo' and p_audio['urgencia'] == 'inmediato':
 			media = instance.media_new(fixed_audios[4])
 			player.set_media(media)
 			player.play()
