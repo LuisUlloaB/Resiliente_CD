@@ -73,11 +73,11 @@ def main():
 							conn.close()
 
 						elif mod[0] == '3':	# Ampli-Izquierdo
-							for r in reg.registers:
-								r /= 10.0
+							for i in range(7):
+								reg.registers[i] /= 10.0
 							try:
 								print("\t└-[+] Insertando registros en tabla: ",mod[1]['nombre'])
-								conn.execute('''INSERT INTO amp_izquierdo (temperatura,current_1,voltage_1,current_2,voltage_2) VALUES (?,?,?,?,?)''',reg.registers)
+								conn.execute('''INSERT INTO amp_izquierdo (temperatura,C_Sensor,V_Sensor,C_Entrada,V_Entrada,C_Ampli_Bocina,V_Rele,enable_ampli) VALUES (?,?,?,?,?,?,?,?)''',reg.registers)
 								conn.commit()
 							except sqlite3.Error as e:
 								print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
@@ -153,49 +153,26 @@ def main():
 										print("\t\t\t└---[!] No se pudo conseguir registros de Activacion ",mod[1]['nombre'])
 
 						elif mod[0] == '7':	# Ampli-Derecho
-							for r in reg.regiters:
-								r /= 10.0
+							for i in range(7):
+								reg.registers[i] /= 10.0
 							try:
 								print("\t└-[+] Insertando registros en tabla: ",mod[1]['nombre'])
-								conn.execute('''INSERT INTO amp_derecho (temperatura,current_1,voltage_1,current_2,voltage_2) VALUES (?,?,?,?,?)''',reg.registers)
+								conn.execute('''INSERT INTO amp_izquierdo (temperatura,C_Sensor,V_Sensor,C_Entrada,V_Entrada,C_Ampli_Bocina,V_Rele,enable_ampli) VALUES (?,?,?,?,?,?,?,?)''',reg.registers)
 								conn.commit()
 							except sqlite3.Error as e:
 								print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
 							conn.close()
 
-						elif mod[0] == '8':	# RDS-Sensores
+						elif mod[0] == '8':	# Sensado-Receptores
 							for r in reg.registers:
 								r /= 10.0
 							try:
 								print("\t└-[+] Insertando registros en tabla: ",mod[1]['nombre'])
-								conn.execute('''INSERT INTO rds_sensores (temperatura,current_1,voltage_1,current_2,voltage_2) VALUES (?,?,?,?,?)''',reg.registers)
+								conn.execute('''INSERT INTO sensado_receptores (temperatura,C_sensado,V_sensado,C_RDS,V_RDS,C_TDT,V_TDT,C_manual,V_manual,C_entrada,V_entrada) VALUES (?,?,?,?,?,?,?,?,?,?,?)''',reg.registers)
 								conn.commit()
 							except sqlite3.Error as e:
 								print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
 							conn.close()
-
-						elif mod[0] == '9':	# TDT-Sensores
-							for r in reg.registers:
-								r /= 10.0
-							try:
-								print("\t└-[+] Insertando registros en tabla: ",mod[1]['nombre'])
-								conn.execute('''INSERT INTO tdt_sensores (temperatura,current_1,voltage_1,current_2,voltage_2) VALUES (?,?,?,?,?)''',reg.registers)
-								conn.commit()
-							except sqlite3.Error as e:
-								print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
-							conn.close()
-
-						elif mod[0] == '10':	# Manual-Sensores
-							for r in reg.registers:
-								r /= 10.0
-							try:
-								print("\t└-[+] Insertando registros en tabla: ",mod[1]['nombre'])
-								conn.execute('''INSERT INTO manual_sensores (temperatura,current_1,voltage_1,current_2,voltage_2) VALUES (?,?,?,?,?)''',reg.registers)
-								conn.commit()
-							except sqlite3.Error as e:
-								print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
-							conn.close()
-
 				else:
 					print("|-[!] Módulo ",mod[1]['nombre']," no responde!")
 	except KeyboardInterrupt:

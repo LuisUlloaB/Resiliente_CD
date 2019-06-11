@@ -1,54 +1,247 @@
 {
-    "ip": "10.0.114.27",
     "modulos": {
         "1": {
+            "data": [
+                "sensor_puerta",
+                "temperatura",
+                "battery_current",
+                "battery_current"
+            ],
+            "error": {
+                "close_door": 1,
+                "max_temp": 75.0,
+                "max_volt_battery": 12.5,
+                "min_curr_battery": 0,
+                "min_temp": -20.0,
+                "min_volt_battery": 10.5
+            },
             "monit_tamanio": 4,
             "nombre": "gabinete"
         },
-        "10": {
-            "monit_tamanio": 5,
-            "nombre": "manual - sensores"
-        },
-        "11": {
-            "monit_tamanio": 3,
-            "nombre": "bocina_der"
-        },
-        "12": {
-            "monit_tamanio": 3,
-            "nombre": "bocina_izq"
-        },
         "2": {
+            "data": [
+                "Temperatura",
+                "C_Fuente",
+                "V_Fuente",
+                "C_PoE",
+                "V_PoE",
+                "C_PreAmpli",
+                "V_PreAmpli",
+                "C_MUX",
+                "V_MUX",
+                "C_Raspberry",
+                "V_Raspberry",
+                "C_Rele",
+                "V_Rele",
+                "C_Switch",
+                "V_Switch",
+                "C_Ampli",
+                "V_Ampli"
+            ],
+            "error": {
+                "max_curr_ampli": 1.0,
+                "max_curr_fuente": 3.0,
+                "max_curr_mux": 1.0,
+                "max_curr_poe": 6.0,
+                "max_curr_preampli": 1.0,
+                "max_curr_raspi": 2.6,
+                "max_curr_rele": 1.0,
+                "max_curr_switch": 1.0,
+                "max_temp": 75.0,
+                "max_volt_ampli": 12.5,
+                "max_volt_fuente": 29.0,
+                "max_volt_mux": 5.5,
+                "max_volt_poe": 24.5,
+                "max_volt_preampli": 12.5,
+                "max_volt_raspi": 5.2,
+                "max_volt_rele": 5.5,
+                "max_volt_switch": 5.5,
+                "min_curr_ampli": 0,
+                "min_curr_fuente": 1.0,
+                "min_curr_mux": 0,
+                "min_curr_poe": 0.5,
+                "min_curr_preampli": 0,
+                "min_curr_raspi": 1.0,
+                "min_curr_rele": 0,
+                "min_curr_switch": 0,
+                "min_temp": -20.0,
+                "min_volt_ampli": 10.5,
+                "min_volt_fuente": 25.0,
+                "min_volt_mux": 4.5,
+                "min_volt_poe": 23.5,
+                "min_volt_preampli": 12.0,
+                "min_volt_raspi": 4.8,
+                "min_volt_rele": 4.5,
+                "min_volt_switch": 4.5
+            },
             "monit_tamanio": 17,
             "nombre": "controlador_digital"
         },
         "3": {
-            "monit_tamanio": 5,
-            "nombre": "amplificador_izq"
+            "data": [
+                "temperatura",
+                "C_Sensor",
+                "V_Sensor",
+                "C_Entrada",
+                "V_Entrada",
+                "C_Ampli_Bocina",
+                "V_Rele",
+                "enable_ampli"
+            ],
+            "error": {
+                "max_curr_ampli_bocina": 2.0,
+                "max_curr_entrada": 1.0,
+                "max_curr_sensor": 1.0,
+                "max_temp": 75.0,
+                "max_volt_entrada": 12.2,
+                "max_volt_rele": 5.2,
+                "max_volt_sensor": 5.2,
+                "min_curr_ampli_bocina": 0,
+                "min_curr_entrada": 0,
+                "min_curr_sensor": 0,
+                "min_temp": -20.0,
+                "min_volt_entrada": 10,
+                "min_volt_rele": 4.6,
+                "min_volt_sensor": 4.9
+            },
+            "monit_tamanio": 8,
+            "nombre": "amp_izquierdo"
         },
         "4": {
+            "data": [
+                "frequency",
+                "lock",
+                "rds_state",
+                "state_2a",
+                "state_9a",
+                "state_11a",
+                "general_state"
+            ],
+            "error": {
+                "first_freq": 107.9,
+                "lock_ok": 1,
+                "rds_state_ok": 1,
+                "second_freq": 92.5
+            },
             "monit_tamanio": 7,
             "nombre": "rds"
         },
         "5": {
+            "data": [
+                "frequency",
+                "lock",
+                "bandwidth",
+                "area",
+                "flag_EWBS",
+                "flag_TMCC",
+                "power"
+            ],
+            "error": {
+                "bandwidth": 6,
+                "freq": 485.142,
+                "lock_ok": 1,
+                "power": 60
+            },
             "monit_tamanio": 6,
             "nombre": "tdt"
         },
         "6": {
+            "data": [
+                "fecha",
+                "boton_activ",
+                "boton_cancel"
+            ],
+            "error": {
+                "timestamp": 15
+            },
             "monit_tamanio": 8,
             "nombre": "manual"
         },
         "7": {
-            "monit_tamanio": 5,
-            "nombre": "amplificador_der"
+            "data": [
+                "temperatura",
+                "C_Sensor",
+                "V_Sensor",
+                "C_Entrada",
+                "V_Entrada",
+                "C_Ampli_Bocina",
+                "V_Rele",
+                "enable_ampli"
+            ],
+            "error": {
+                "max_curr_ampli_bocina": 2.0,
+                "max_curr_entrada": 1.0,
+                "max_curr_sensor": 1.0,
+                "max_temp": 75.0,
+                "max_volt_entrada": 12.2,
+                "max_volt_rele": 5.2,
+                "max_volt_sensor": 5.2,
+                "min_curr_ampli_bocina": 0,
+                "min_curr_entrada": 0,
+                "min_curr_sensor": 0,
+                "min_temp": -20.0,
+                "min_volt_entrada": 10,
+                "min_volt_rele": 4.6,
+                "min_volt_sensor": 4.9
+            },
+            "monit_tamanio": 8,
+            "nombre": "amp_derecho"
         },
         "8": {
-            "monit_tamanio": 5,
-            "nombre": "rds - sensores"
-        },
-        "9": {
-            "monit_tamanio": 5,
-            "nombre": "tdt - sensores"
+            "data": [
+                "temperatura",
+                "C_sensado",
+                "V_sensado",
+                "C_RDS",
+                "V_RDS",
+                "C_TDT",
+                "V_TDT",
+                "C_manual",
+                "V_manual",
+                "C_entrada",
+                "V_entrada"
+            ],
+            "error": {
+                "max_curr_entrada": 2.2,
+                "max_curr_manual": 1.2,
+                "max_curr_rds": 1.2,
+                "max_curr_sensado": 1.2,
+                "max_curr_tdt": 2.6,
+                "max_temp": 75.0,
+                "max_volt_entrada": 28.5,
+                "max_volt_manual": 5.5,
+                "max_volt_rds": 5.5,
+                "max_volt_sensado": 5.5,
+                "max_volt_tdt": 5.5,
+                "min_curr_entrada": 1.8,
+                "min_curr_manual": 0,
+                "min_curr_rds": 0,
+                "min_curr_sensado": 0.5,
+                "min_curr_tdt": 1.0,
+                "min_temp": -20.0,
+                "min_volt_entrada": 27.5,
+                "min_volt_manual": 4.5,
+                "min_volt_rds": 4.5,
+                "min_volt_sensado": 4.5,
+                "min_volt_tdt": 4.5
+            },
+            "monit_tamanio": 11,
+            "nombre": "sensado_receptores"
         }
+    },
+    "pi": {
+        "ip": "10.0.114.27",
+        "tablas": [
+            "activacion",
+            "controlador_digital",
+            "amp_derecho",
+            "gabinete",
+            "tdt",
+            "amp_izquierdo",
+            "manual",
+            "sensado_receptores",
+            "rds"
+        ]
     },
     "puertos": {
         "monit_activ": {

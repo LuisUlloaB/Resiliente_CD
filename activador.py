@@ -43,27 +43,27 @@ def activar(reg,id_slave,primer_intento = False):
 			Estado_act (True|False): Indicador de éxito o falla en proceso
 						 de activación.
 	"""
-	CAP = {	'identificador':['Indeci','GobiernoLocal','Prueba','Otro'],
-		'estado':['actual','simulacro','prueba','alarma'],
-		'tipo_mensaje':['alerta','actualiza','cancela','confirmado','error'],
+	CAP = {	'identificador':['Indeci','GobiernoLocal','Prueba','Otros'],
+		'estado':['Actual','Simulacro','Prueba','Alarma'],
+		'tipo_mensaje':['Alerta','Actualiza','Cancela','Confirma','Error'],
 		'ambito':['Publico','Privado'],
-		'idioma':['Espanol','Quechua','Ingles','Otro'],
+		'idioma':['Espanol','Quechua','Ingles','Otros'],
 		'categoria':['GeodinamicaInterna','GeodinamicaExterna','Hidrometeorologico','Biologico','Humano','Seguridad','Otro'],
-		'evento':['actividadVolcanica','sismo','tsunami','alud','aluvion','derrumbeCerro','deslizamiento','crecidaRio','granizada','helada','huayco','inundacion','lluviaIntensa','marejada','nevada','sequia','tormenta','vientoFuerte','colapsoConstruccion','contaminacionAgua','contaminacionSuelo','explosion','derrameSustNocivas','incendioForestal','incendioUrbano','epidemia','plaga','otro'],
-		'tipo_respuesta':['abrigarse','evacuar','preparar','ejecutar','monitorear','evaluar','otro','ninguno'],
-		'urgencia':['inmediato','esperado','futura','pasada','desconocida'],
-		'severidad':['extremo','severo','moderado','menor','desconocido'],
+		'evento':['ActividadVolcanica','Sismo','Tsunami','Alud','Aluvion','DerrumbeCerro','Deslizamiento','CrecidaRio','Granizada','Helada','Huayco','Inundacion','LluviaIntensa','Marejada','Nevada','Sequia','Tormenta','VientoFuerte','ColapsoConstruccion','ContaminacionAgua','ContaminacionSuelo','Explosion','DerrameSustNocivas','IncendioForestal','IncendioUrbano','Epidemia','Plaga','Otro'],
+		'tipo_respuesta':['Abrigarse','Evacuar','Preparar','Ejecutar','Monitorear','Evaluar','Otro','Ninguno'],
+		'urgencia':['Inmediato','Esperado','Futuro','Pasado','Desconocida'],
+		'severidad':['Extremo','Severo','Moderado','Menor','Desconocido'],
 		'certeza':['Confirmado','Probable','Improbable','Desconocido'],
-		'color':['Rojo','Ambar','Verde']}
+		'color_alerta':['Rojo','Ambar','Verde']}
 
 	#extraer data
 	var_audio = {
-			'estado':CAP["estado"][reg[6]],
-			'evento':CAP["evento"][reg[11]],
-			'severidad':CAP["severidad"][reg[14]],
-			'respuesta':CAP["tipo_respuesta"][reg[12]],
-			'urgencia':CAP["urgencia"][reg[13]],
-			'mensaje':CAP["tipo_mensaje"][reg[7]]}
+			'estado':CAP["estado"][reg[6]].lower(),
+			'evento':CAP["evento"][reg[11]].lower(),
+			'severidad':CAP["severidad"][reg[14]].lower(),
+			'respuesta':CAP["tipo_respuesta"][reg[12]].lower(),
+			'urgencia':CAP["urgencia"][reg[13]].lower(),
+			'mensaje':CAP["tipo_mensaje"][reg[7]].lower()}
 	print("\t\t\t└---",var_audio)
 
 	area = str(reg[32]) + str(reg[33])
