@@ -10,12 +10,12 @@ gpio.setwarnings(False)
 gpio.setup(18, gpio.IN)
 
 try:
-	logging.info("[+] Script de apagado seguro")
+	#logging.info("[+] Script de apagado seguro")
 	while True:
 		if gpio.input(18):
 			logging.warning("[!] Apagando sub modulo de controlador central (Raspberry Pi)")
 			result = os.popen("sudo shutdown -h now").read()
-		sleep(3)
+		#sleep(3)
 except KeyboardInterrupt:
 	logging.info("[!] Deteniendo...")
 	gpio.cleanup()
