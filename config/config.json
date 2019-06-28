@@ -231,6 +231,7 @@
     },
     "pi": {
         "ip": "10.0.114.27",
+        "modo": "normal",
         "tablas": [
             "activacion",
             "controlador_digital",
@@ -258,6 +259,7 @@
     "servidor": {
         "ip": "10.0.114.10",
         "password": "admin123",
+        "path": "/admin/archivos/",
         "user": "admin"
     }
 }
