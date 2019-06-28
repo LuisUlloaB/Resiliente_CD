@@ -15,13 +15,34 @@ gpio.setwarnings(False)
 gpio.setup(13, gpio.OUT, initial=0)
 gpio.setup(12, gpio.OUT, initial=0)
 
+#Indicadores-LED
+Leds = {
+	'L_Encendido': [ 6 , 5 , 11 ],
+	'L_Temp': [ 9 , 25 , 10 ],
+	'L_Volt': [ 24 , 22 , 23 ],
+	'L_Amp': [ 27 , 4 , 17 ]
+}
+for l in Leds.items():
+	for x in l[1]:
+		gpio.setup(x, gpio.OUT, initial=0)
+
 #Activacion
+last_slave = 0
 inicio = 0
 final = 0
 audio_param = 0
 t_mensaje = 0
 ip_controlador = 0
 tablas = 0
+
+#Notificacion
+flag_notif = False
+notif = {
+	'type':"Notification",
+	'ip': "",
+	"enabled_alert": "",
+	"alert_way": ""
+}
 
 #parámetros del sistema
 p_sistema = {
@@ -142,7 +163,7 @@ p_sistema = {
 #sorted(p_sistema.items())
 
 def main():
-	global ip_controlador, tablas
+	global ip_controlador, tablas, notif, flag_notif, last_slave
 	while True:
 		try:
 			with open('/home/pi/Resiliente_CD/config/config.json','r') as cfg:
@@ -152,11 +173,16 @@ def main():
 			print("[+] Conectando a la base de datos: resiliente.db")
 			conn = sqlite3.connect('resiliente.db')
 			get_activ(conn)
+			#get_monit_gabinete(conn)
+			#get_monit_controlador_digital(conn)
+			#get_monit_amp_izquierdo(conn)
 			get_monit_rds(conn)
-			get_activ(conn)
+			#get_monit_tdt(conn)
 			get_monit_manual(conn)
+			#get_monit_amp_derecho(conn)
+			#get_monit_sensado_receptores(conn)
 			get_activ(conn)
-			if int( time.strftime("%H", time.localtime()) ) % 4 == 0:
+			if int( time.strftime("%H", time.localtime()) ) % 4 == 0 and int( time.strftime("%M", time.localtime()) ) == 0:
 				backup_db(conn)
 		except sqlite3.Error as e:
 			print("[!] Sqlite3 error, ID: ",e.args[0])
@@ -166,32 +192,49 @@ def main():
 		print("--> Epoch actual: " + str(int(time.time())-18000))
 		print("--> Epoch de inicio: "+str(inicio))
 		print("--> Epoch de fin: "+str(final))
-		if (int(time.time()) - 18000) >= int(inicio) and (int(time.time()) - 18000) <= int(final) and t_mensaje != "cancela":
+		if (int(time.time()) - 18000) >= int(inicio) and (int(time.time()) - 18000) <= int(final) and t_mensaje != "cancela" and t_mensaje != "Cancela":
 			gpio.output(13,1)
 			gpio.output(12,1)
 			d = int(final) - (int(time.time()) - 18000)
 			print("Duración: "+str(d)+" segundos")
+			if flag_notif == False:
+				flag_notif = True
+				notif['ip'] = conf['pi']['ip']
+				notif['enabled_alert'] = True
+				notif['alert_way'] = conf['modulos'][str(last_slave)]['nombre']
+				sftp.envio(notif,name='Notification')
+				os.system("rm Notification.json")
 		else:
 			gpio.output(13,0)
 			gpio.output(12,0)
+			if flag_notif == True:
+				flag_notif = False
+				notif['ip'] = conf['pi']['ip']
+				notif['enabled_alert'] = False
+				notif['alert_way'] = conf['modulos'][str(last_slave)]['nombre']
+				sftp.envio(notif,name='Notification')
+				os.system("rm Notification.json")
 		conn.close()
 		time.sleep(1)
 
 def backup_db(conn):
 	global tablas
-	#tablas = ["activacion","controlador_digital","amp_derecho","gabinete",
-	#	"tdt","amp_izquierdo","manual","sensado_receptores","rds"]
+	cursor = conn.cursor()
 	for t in tablas:
 		with open(("./csv/"+t+".csv"),"wb") as f:
-			cursor = conn.cursor()
 			for row in cursor.execute("SELECT * FROM "+t):
 				writeRow = ",".join([str(i) for i in row])
 				writeRow += "\n"
 				f.write(writeRow.encode())
 	for t in tablas:
 		sftp.bck_db(t)
+	for t in tablas:
+		conn.execute("DELETE FROM "+t)
+		conn.execute("""UPDATE sqlite_sequence SET seq = 0 WHERE name= ? """, t)
+		conn.commit()
 
 def activ_request(conn):
+	global last_slave
 	try:
 		with open('/home/pi/Resiliente_CD/Activation.json','r') as f_act:
 			print("[+] Existe Activacion via web")
@@ -205,6 +248,7 @@ def activ_request(conn):
 				conn.commit()
 			except sqlite3.Error as e:
 				print("[!] Sqlite3 error, ID: ",e.args[0])
+			last_slave = 0
 			print("[+] Extrayendo parámetros de audio")
 			var_audio = {
 				'estado':p_act["data"]["estado"],
@@ -257,15 +301,16 @@ def monit_request_response():
 		print("[!] No existe solicitud de monitoreo")
 
 def get_activ(conn):
-	global inicio, final, t_mensaje
+	global inicio, final, t_mensaje, last_slave
 	print("[+] Extrayendo parámetros tiempo de inicio - final  del ultimo registro de activación")
 	cur = conn.cursor()
-	cur.execute('''SELECT fecha_inicio,fecha_fin,tipo_mensaje FROM activacion WHERE ID=(SELECT MAX(ID) FROM activacion)''')
+	cur.execute('''SELECT fecha_inicio,fecha_fin,tipo_mensaje,slave FROM activacion WHERE ID=(SELECT MAX(ID) FROM activacion)''')
 	tiempos = cur.fetchall()
 	for x in tiempos:
 		inicio = x[0]
 		final = x[1]
 		t_mensaje = x[2]
+		last_slave = x[3]
 
 def get_monit_rds(conn):
 	global p_sistema

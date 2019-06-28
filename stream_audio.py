@@ -31,6 +31,12 @@ def main():
 		if (int(time.time()) - 18000) >= int(inicio) and (int(time.time()) - 18000) <= int(fin):
 			with open('audio_param.json') as file:
 				p_audio = json.load(file)
+			p_audio['evento'] = p_audio['evento'].lower()
+			p_audio['estado'] = p_audio['estado'].lower()
+			p_audio['urgencia'] = p_audio['urgencia'].lower()
+			p_audio['respuesta'] = p_audio['respuesta'].lower()
+			p_audio['severidad'] = p_audio['severidad'].lower()
+			p_audio['mensaje'] = p_audio['mensaje'].lower()
 			if p_audio['mensaje'] != 'cancela':
 				audio_gen(True)
 		#else:

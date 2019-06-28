@@ -58,12 +58,13 @@ def activar(reg,id_slave,primer_intento = False):
 
 	#extraer data
 	var_audio = {
-			'estado':CAP["estado"][reg[6]].lower(),
-			'evento':CAP["evento"][reg[11]].lower(),
-			'severidad':CAP["severidad"][reg[14]].lower(),
-			'respuesta':CAP["tipo_respuesta"][reg[12]].lower(),
-			'urgencia':CAP["urgencia"][reg[13]].lower(),
-			'mensaje':CAP["tipo_mensaje"][reg[7]].lower()}
+			'estado': CAP["estado"][reg[6]],
+			'evento': CAP["evento"][reg[11]],
+			'severidad': CAP["severidad"][reg[14]],
+			'respuesta': CAP["tipo_respuesta"][reg[12]],
+			'urgencia': CAP["urgencia"][reg[13]],
+			'mensaje': CAP["tipo_mensaje"][reg[7]]
+	}
 	print("\t\t\t└---",var_audio)
 
 	area = str(reg[32]) + str(reg[33])
@@ -119,7 +120,10 @@ def activar(reg,id_slave,primer_intento = False):
 		print("\t\t\t└---[+] Conectando a la base de datos: resiliente.db")
 		conn = sqlite3.connect('resiliente.db')
 		print("\t\t\t└---[+] Insertando data en tabla: activacion")
-		conn.execute('''INSERT INTO activacion (slave,identificador,fecha_hora,estado,tipo_mensaje,ambito,idioma,categoria,evento,tipo_respuesta,urgencia,severidad,certeza,color_alerta,fecha_efectivo,fecha_inicio,fecha_fin,area,texto) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',(id_slave,CAP["identificador"][reg[0]],str(epoch_fecha_hora),CAP["estado"][reg[6]],CAP["tipo_mensaje"][reg[7]],CAP["ambito"][reg[8]],CAP["idioma"][reg[9]],CAP["categoria"][reg[10]],CAP["evento"][reg[11]],CAP["tipo_respuesta"][reg[12]],CAP["urgencia"][reg[13]],CAP["severidad"][reg[14]],CAP["certeza"][reg[15]],CAP["color"][reg[16]],str(epoch_efectivo),str(epoch_inicio),str(epoch_final),area,texto))
+		conn.execute('''INSERT INTO activacion (slave,identificador,fecha_hora,estado,tipo_mensaje,ambito,idioma,categoria,evento,tipo_respuesta,urgencia,severidad,certeza,color_alerta,
+			fecha_efectivo,fecha_inicio,fecha_fin,area,texto) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',(id_slave,CAP["identificador"][reg[0]],str(epoch_fecha_hora),
+			CAP["estado"][reg[6]],CAP["tipo_mensaje"][reg[7]],CAP["ambito"][reg[8]],CAP["idioma"][reg[9]],CAP["categoria"][reg[10]],CAP["evento"][reg[11]],CAP["tipo_respuesta"][reg[12]],
+			CAP["urgencia"][reg[13]],CAP["severidad"][reg[14]],CAP["certeza"][reg[15]],CAP["color_alerta"][reg[16]],str(epoch_efectivo),str(epoch_inicio),str(epoch_final),area,texto))
 		conn.commit()
 	except sqlite3.Error as e:
 		print("\t\t\t└---[!] Sqlite3 error, ID: ",e.args[0])
