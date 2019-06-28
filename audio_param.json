@@ -1,8 +1,8 @@
 {
-    "severidad": "moderado",
-    "mensaje": "cancela",
-    "estado": "actual",
-    "respuesta": "evacuar",
-    "evento": "crecidaRio",
-    "urgencia": "inmediato"
+    "urgencia": "Inmediato",
+    "severidad": "Extremo",
+    "evento": "Tsunami",
+    "mensaje": "Cancela",
+    "respuesta": "Evacuar",
+    "estado": "Simulacro"
 }
