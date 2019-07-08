@@ -39,6 +39,18 @@ def main():
 
 	try:
 		while True:
+			try:
+				with open('/home/pi/Resiliente_CD/config/config.json') as cfg:
+					sys = json.load(cfg)
+					modo = sys['pi']['modo']
+			except FileNotFoundError:
+				print("[!] NO EXISTE FICHERO DE CONFIGURACION")
+				return -1
+			if modo != "normal":
+				print("[!] RPi no configurado en modo normal")
+				client.close()
+				return 1
+
 			for mod in sorted(modulos.items()):
 				reg = client.read_holding_registers(0,mod[1]['monit_tamanio'],unit=int(mod[0]))
 				if not reg.isError():
