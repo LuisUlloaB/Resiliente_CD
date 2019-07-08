@@ -231,7 +231,7 @@
     },
     "pi": {
         "ip": "10.0.114.27",
-        "modo": "normal",
+        "modo": "test",
         "tablas": [
             "activacion",
             "controlador_digital",
@@ -242,17 +242,18 @@
             "manual",
             "sensado_receptores",
             "rds"
-        ]
+        ],
+        "test_modbus_id": 1
     },
     "puertos": {
         "monit_activ": {
             "fisico": "usb 1-1.4",
-            "logico": "ttyUSB0",
+            "logico": "ttyUSB1",
             "referencia": "UP - LEFT"
         },
         "test": {
             "fisico": "usb 1-1.2",
-            "logico": "none",
+            "logico": "ttyUSB0",
             "referencia": "UP - RIGHT"
         }
     },
