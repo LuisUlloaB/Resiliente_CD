@@ -259,8 +259,8 @@
     },
     "servidor": {
         "ip": "10.0.114.10",
-        "password": "admin123",
-        "path": "/admin/archivos/",
-        "user": "admin"
+        "password": "inicteluni",
+        "path": "/home/inictel-uni/Resiliente_server/",
+        "user": "inictel-uni"
     }
 }

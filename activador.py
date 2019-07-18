@@ -118,7 +118,7 @@ def activar(reg,id_slave,primer_intento = False):
 	#ingresar a base de datos
 	try:
 		print("\t\t\t└---[+] Conectando a la base de datos: resiliente.db")
-		conn = sqlite3.connect('resiliente.db')
+		conn = sqlite3.connect('/home/pi/Resiliente_CD/resiliente.db')
 		print("\t\t\t└---[+] Insertando data en tabla: activacion")
 		conn.execute('''INSERT INTO activacion (slave,identificador,fecha_hora,estado,tipo_mensaje,ambito,idioma,categoria,evento,tipo_respuesta,urgencia,severidad,certeza,color_alerta,
 			fecha_efectivo,fecha_inicio,fecha_fin,area,texto) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',(id_slave,CAP["identificador"][reg[0]],str(epoch_fecha_hora),
@@ -130,7 +130,7 @@ def activar(reg,id_slave,primer_intento = False):
 	conn.close()
 
 	#parámetros para audio
-	with open('audio_param.json','w') as file:
+	with open('/home/pi/Resiliente_CD/audio_param.json','w') as file:
 		json.dump(var_audio,file,indent=4)
 
 	print("\t\t└--[!][!][!][!][!]*****************************END*****************************[!][!][!][!][!]")

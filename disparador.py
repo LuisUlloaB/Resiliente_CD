@@ -171,7 +171,7 @@ def main():
 				ip_controlador = conf['pi']['ip']
 				tablas = conf['pi']['tablas']
 			print("[+] Conectando a la base de datos: resiliente.db")
-			conn = sqlite3.connect('resiliente.db')
+			conn = sqlite3.connect('/home/pi/Resiliente_CD/resiliente.db')
 			get_activ(conn)
 			#get_monit_gabinete(conn)
 			#get_monit_controlador_digital(conn)
@@ -203,7 +203,7 @@ def main():
 				notif['enabled_alert'] = True
 				notif['alert_way'] = conf['modulos'][str(last_slave)]['nombre']
 				sftp.envio(notif,name='Notification')
-				os.system("rm Notification.json")
+				os.system("rm /home/pi/Resiliente_CD/Notification.json")
 		else:
 			gpio.output(13,0)
 			gpio.output(12,0)
@@ -213,7 +213,7 @@ def main():
 				notif['enabled_alert'] = False
 				notif['alert_way'] = conf['modulos'][str(last_slave)]['nombre']
 				sftp.envio(notif,name='Notification')
-				os.system("rm Notification.json")
+				os.system("rm /home/pi/Resiliente_CD/Notification.json")
 		conn.close()
 		time.sleep(1)
 
@@ -221,7 +221,7 @@ def backup_db(conn):
 	global tablas
 	cursor = conn.cursor()
 	for t in tablas:
-		with open(("./csv/"+t+".csv"),"wb") as f:
+		with open(("/home/pi/Resiliente_CD//csv/"+t+".csv"),"wb") as f:
 			for row in cursor.execute("SELECT * FROM "+t):
 				writeRow = ",".join([str(i) for i in row])
 				writeRow += "\n"
@@ -260,9 +260,9 @@ def activ_request(conn):
 			}
 			if p_act["data"]["tipo_mensaje"] != "cancela":
 				print("[+] Generando fichero de audio 'audio_param.json' ")
-				with open('audio_param.json','w') as file:
+				with open('/home/pi/Resiliente_CD/audio_param.json','w') as file:
 					json.dump(var_audio,file,indent=4)
-			os.system('rm Activation.json')
+			os.system('rm /home/pi/Resiliente_CD/Activation.json')
 	except FileNotFoundError:
 		print("[!] No existe activacion via web")
 
@@ -296,7 +296,7 @@ def monit_request_response():
 				sftp.envio(re,name="Response")
 			else:
 				print("[!] Request.json no válido: Error de formato")
-			os.system('rm Response.json Request.json')
+			os.system('rm /home/pi/Resiliente_CD/Response.json /home/pi/Resiliente_CD/Request.json')
 	except FileNotFoundError:
 		print("[!] No existe solicitud de monitoreo")
 
@@ -453,7 +453,7 @@ def get_monit_sensado_receptores(conn):
 def verificar_patron(mod):
 	global p_sistema, ip_controlador
 
-	with open('config/config.json','r') as cmp:
+	with open('/home/pi/Resiliente_CD/config/config.json','r') as cmp:
 		config = json.load(cmp)
 		modulos = config["modulos"]
 		err = {}
@@ -475,7 +475,7 @@ def verificar_patron(mod):
 			p_sistema['rds']['ip'] = ip_controlador
 			print("[!] Enviando reporte JSON a servidor web...")
 			sftp.envio(p_sistema['rds'],name="Error")
-			os.system("rm Error.json")
+			os.system("rm /home/pi/Resiliente_CD/Error.json")
 
 	elif mod == 'manual':
 		if int(p_sistema['manual']['data']['fecha']) > int(time.time()) - 18000 - err["manual"]["timestamp"]:
@@ -487,7 +487,7 @@ def verificar_patron(mod):
 			print(p_sistema['manual']['data']['fecha'])
 			print("[!] Enviando reporte JSON a servidor web...")
 			sftp.envio(p_sistema['manual'],name="Error")
-			os.system("rm Error.json")
+			os.system("rm /home/pi/Resiliente_CD/Error.json")
 
 	elif mod == 'tdt':
 		if (p_sistema['tdt']['data']['frequency'] == err["tdt"]["freq"]
@@ -501,7 +501,7 @@ def verificar_patron(mod):
 			p_sistema['tdt']['ip'] = ip_controlador
 			print("[!] Enviando reporte JSON a servidor web...")
 			sftp.envio(p_sistema['tdt'],name="Error")
-			os.system("rm Error.json")
+			os.system("rm /home/pi/Resiliente_CD/Error.json")
 
 	elif mod == 'gabinete':
 		if (p_sistema['gabinete']['data']['sensor_puerta'] == err["gabinete"]["close_door"]
@@ -517,7 +517,7 @@ def verificar_patron(mod):
 			p_sistema['gabinete']['ip'] = ip_controlador
 			print("[!] Enviando reporte JSON a servidor web...")
 			sftp.envio(p_sistema['gabinete'],name="Error")
-			os.system("rm Error.json")
+			os.system("rm /home/pi/Resiliente_CD/Error.json")
 
 	elif mod == 'amp_izquierdo':
 		if (p_sistema['amp_izquierdo']['data']['temperatura'] < err["amp_izquierdo"]["max_temp"]
@@ -541,7 +541,7 @@ def verificar_patron(mod):
 			p_sistema['amp_izquierdo']['ip'] = ip_controlador
 			print("[!] Enviando reporte JSON a servidor web...")
 			sftp.envio(p_sistema['amp_izquierdo'],name="Error")
-			os.system("rm Error.json")
+			os.system("rm /home/pi/Resiliente_CD/Error.json")
 
 	elif mod == 'amp_derecho':
 		if (p_sistema['amp_derecho']['data']['temperatura'] < err["amp_derecho"]["max_temp"]
@@ -565,7 +565,7 @@ def verificar_patron(mod):
 			p_sistema['amp_derecho']['ip'] = ip_controlador
 			print("[!] Enviando reporte JSON a servidor web...")
 			sftp.envio(p_sistema['amp_derecho'],name="Error")
-			os.system("rm Error.json")
+			os.system("rm /home/pi/Resiliente_CD/Error.json")
 
 	elif mod == 'sensado_receptores':
 		if (p_sistema['sensado_receptores']['data']['temperatura'] < err["sensado_receptores"]["max_temp"]
@@ -597,7 +597,7 @@ def verificar_patron(mod):
 			p_sistema['sensado_receptores']['ip'] = ip_controlador
 			print("[!] Enviando reporte JSON a servidor web...")
 			sftp.envio(p_sistema['sensado_receptores'],name="Error")
-			os.system("rm Error.json")
+			os.system("rm /home/pi/Resiliente_CD/Error.json")
 
 	elif mod == 'controlador_digital':
 		if (p_sistema['controlador_digital']['data']['Temperatura'] < err["controlador_digital"]["max_temp"]
@@ -641,7 +641,7 @@ def verificar_patron(mod):
 			p_sistema['controlador_digital']['ip'] = ip_controlador
 			print("[!] Enviando reporte JSON a servidor web...")
 			sftp.envio(p_sistema['controlador_digital'],name="Error")
-			os.system("rm Error.json")
+			os.system("rm /home/pi/Resiliente_CD/Error.json")
 
 if __name__ == '__main__':
 	print("[+] Script controlador de activacion")

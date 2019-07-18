@@ -13,7 +13,7 @@ def main():
 	global inicio,fin,slaveID,p_audio
 	while True:
 		try:
-			conn = sqlite3.connect('resiliente.db')
+			conn = sqlite3.connect('/home/pi/Resiliente_CD/resiliente.db')
 			cur = conn.cursor()
 			cur.execute('''SELECT slave,fecha_inicio,fecha_fin FROM activacion WHERE ID=(SELECT MAX(ID) FROM activacion)''')
 			tiempos = cur.fetchall()
@@ -29,7 +29,7 @@ def main():
 		now = int(time.time()) - 18000
 		print("Now:	"+str(now))
 		if (int(time.time()) - 18000) >= int(inicio) and (int(time.time()) - 18000) <= int(fin):
-			with open('audio_param.json') as file:
+			with open('/home/pi/Resiliente_CD/audio_param.json') as file:
 				p_audio = json.load(file)
 			p_audio['evento'] = p_audio['evento'].lower()
 			p_audio['estado'] = p_audio['estado'].lower()
@@ -46,15 +46,19 @@ def main():
 def audio_gen(estado):
 	global p_audio, slaveID
 	print(p_audio)
-	x = ['audios/'+p_audio['estado']+'.wav','audios/'+p_audio['evento']+'.wav','audios/'+p_audio['severidad']+'.wav','audios/'+p_audio['respuesta']+'.wav','audios/'+p_audio['urgencia']+'.wav']
-	fixed_audios = ["audios/alerta_crecidario_evacuar_inmediata.wav",
-			"audios/alerta_crecidario_extremo_evacuar_inmediata.wav",
-			"audios/alerta_sismo_extremo_evacuar_inmediata.wav",
-			"audios/alerta_tsunami_extremo_evacuar_inmediata.wav",
-			"audios/simulacro_crecidario_extremo_evacuar_inmediata.wav",
-			"audios/simulacro_inundacion_extremo_evacuar_inmediata.wav",
-			"audios/simulacro_sismo_extremo_evacuar_inmediata.wav",
-			"audios/simulacro_tsunami_extremo_evacuar_inmediata.wav"]
+	x = ['/home/pi/Resiliente_CD/audios/'+p_audio['estado']+'.wav',
+		 '/home/pi/Resiliente_CD/audios/'+p_audio['evento']+'.wav',
+		 '/home/pi/Resiliente_CD/audios/'+p_audio['severidad']+'.wav',
+		 '/home/pi/Resiliente_CD/audios/'+p_audio['respuesta']+'.wav',
+		 '/home/pi/Resiliente_CD/audios/'+p_audio['urgencia']+'.wav']
+	fixed_audios = ["/home/pi/Resiliente_CD/audios/alerta_crecidario_evacuar_inmediata.wav",
+			"/home/pi/Resiliente_CD/audios/alerta_crecidario_extremo_evacuar_inmediata.wav",
+			"/home/pi/Resiliente_CD/audios/alerta_sismo_extremo_evacuar_inmediata.wav",
+			"/home/pi/Resiliente_CD/audios/alerta_tsunami_extremo_evacuar_inmediata.wav",
+			"/home/pi/Resiliente_CD/audios/simulacro_crecidario_extremo_evacuar_inmediata.wav",
+			"/home/pi/Resiliente_CD/audios/simulacro_inundacion_extremo_evacuar_inmediata.wav",
+			"/home/pi/Resiliente_CD/audios/simulacro_sismo_extremo_evacuar_inmediata.wav",
+			"/home/pi/Resiliente_CD/audios/simulacro_tsunami_extremo_evacuar_inmediata.wav"]
 	instance = vlc.Instance()
 	player = instance.media_player_new()
 	player.audio_set_volume(250)

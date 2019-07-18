@@ -57,7 +57,7 @@ def main():
 					print("|-[+] Registros Monitoreo ",mod[1]['nombre'],": ",reg.registers)
 					try:
 						print("\t└-[+] Conectando a la base de datos: resiliente.db")
-						conn = sqlite3.connect('resiliente.db')
+						conn = sqlite3.connect('/home/pi/Resiliente_CD/resiliente.db')
 					except sqlite3.Error as e:
 						print("\t└-[!] Sqlite3 error, ID: ",e.args[0])
 					else:
