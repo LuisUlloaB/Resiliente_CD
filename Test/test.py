@@ -1,5 +1,6 @@
 import os, sys
 import json
+import time
 from pymodbus.server.async import StartSerialServer
 from pymodbus.device import ModbusDeviceIdentification
 from pymodbus.datastore import ModbusSequentialDataBlock
@@ -28,11 +29,11 @@ def updating_writer(a):
 	values = context[slave_id].getValues(fx, address, count=num_reg)
 
 	# Imprime en pantalla los valores de los registros
-	#print("=============================================")
-	#for v in range(11):
-	# 	print(values[v])
-	#print("Estado Prueba RTC: ", str(values[85]))
-	#print("=============================================")
+	print("=============================================")
+	for v in range(74):
+	 	print(values[v + 11])
+	print("Estado Prueba Activ: ", str(values[86]))
+	print("=============================================")
 
 	pruebas = context[slave_id].getValues(fx, address + 85, count=num_pruebas)
 
@@ -87,9 +88,11 @@ def updating_writer(a):
 			CAP[14] != f_creacion[2] and CAP[15] != f_creacion[3] and
 			CAP[16] != f_creacion[4]):
 			if f_creacion[0] == 0 and f_creacion[1] == 0:
-				activador.activar(reg=CAP,id_slave=0,primer_intento=True)
+				print("primer intento exitoso!")
+				# activador.activar(reg=CAP,id_slave=0,primer_intento=True)
 			elif f_creacion[0] != 0 and f_creacion[1] != 0:
-				activador.activar(reg=CAP,id_slave=0,primer_intento=False)
+				print("intento exitoso!!")
+				# activador.activar(reg=CAP,id_slave=0,primer_intento=False)
 			for i in range(5):
 				f_creacion[i] = CAP[i + 12]
 
@@ -112,7 +115,7 @@ def run_server(puerto='none', slave_id=1, modo='normal'):
 	identity.MajorMinorRevision = '1.0'
 
 
-	time = 2
+	time = 3
 	loop = LoopingCall(f=updating_writer,  a=(context,))
 	loop.start(time, now=False)
 	# RTU:
