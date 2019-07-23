@@ -29,11 +29,11 @@ def updating_writer(a):
 	values = context[slave_id].getValues(fx, address, count=num_reg)
 
 	# Imprime en pantalla los valores de los registros
-	print("=============================================")
-	for v in range(74):
-	 	print(values[v + 11])
-	print("Estado Prueba Activ: ", str(values[86]))
-	print("=============================================")
+	# print("=============================================")
+	# for v in range(74):
+	# 	print(values[v + 11])
+	# print("Estado Prueba Activ: ", str(values[86]))
+	# print("=============================================")
 
 	pruebas = context[slave_id].getValues(fx, address + 85, count=num_pruebas)
 
@@ -84,9 +84,19 @@ def updating_writer(a):
 	if pruebas[1] == 1:
 		# CAP
 		CAP = context[slave_id].getValues(fx, address + 11, count=74)
-		if (CAP[12] != f_creacion[0] and CAP[13] != f_creacion[1] and
-			CAP[14] != f_creacion[2] and CAP[15] != f_creacion[3] and
-			CAP[16] != f_creacion[4]):
+		print("¡¡CAP Obtenido!!")
+		print("Fecha Creación - MJD1: 		"+str(CAP[1]))
+		print("Fecha Creación - MJD2: 		"+str(CAP[2]))
+		print("Fecha Creación - hora: 		"+str(CAP[3]))
+		print("Fecha Creación - minutos: 	"+str(CAP[4]))
+		print("Fecha Creación - seg: 		"+str(CAP[5]))
+		s = ""
+		for i in range(34,74):
+			s += chr(CAP[i])
+		print(s)
+		if (CAP[1] != f_creacion[0] and CAP[2] != f_creacion[1] and
+			CAP[3] != f_creacion[2] and CAP[4] != f_creacion[3] and
+			CAP[5] != f_creacion[4]):
 			if f_creacion[0] == 0 and f_creacion[1] == 0:
 				print("primer intento exitoso!")
 				# activador.activar(reg=CAP,id_slave=0,primer_intento=True)
