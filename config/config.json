@@ -1,5 +1,8 @@
 {
     "modulos": {
+        "0": {
+            "nombre": "software_test"
+        },
         "1": {
             "data": [
                 "sensor_puerta",
