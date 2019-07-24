@@ -31,7 +31,7 @@ def updating_writer(a):
 	# Imprime en pantalla los valores de los registros
 	# print("=============================================")
 	# for v in range(74):
-	# 	print(values[v + 11])
+	#  	print(values[v + 11])
 	# print("Estado Prueba Activ: ", str(values[86]))
 	# print("=============================================")
 
@@ -99,12 +99,14 @@ def updating_writer(a):
 			CAP[5] != f_creacion[4]):
 			if f_creacion[0] == 0 and f_creacion[1] == 0:
 				print("primer intento exitoso!")
-				# activador.activar(reg=CAP,id_slave=0,primer_intento=True)
+				activador.activar(reg=CAP,id_slave=0,primer_intento=True)
 			elif f_creacion[0] != 0 and f_creacion[1] != 0:
 				print("intento exitoso!!")
-				# activador.activar(reg=CAP,id_slave=0,primer_intento=False)
+				activador.activar(reg=CAP,id_slave=0,primer_intento=False)
 			for i in range(5):
 				f_creacion[i] = CAP[i + 12]
+		else:
+			print("[!] Error: CAP repetido")
 
 
 
