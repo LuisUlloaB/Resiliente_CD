@@ -202,8 +202,9 @@ def main():
 				notif['ip'] = conf['pi']['ip']
 				notif['enabled_alert'] = True
 				notif['alert_way'] = conf['modulos'][str(last_slave)]['nombre']
-				sftp.envio(notif,name='Notification')
-				os.system("rm /home/pi/Resiliente_CD/Notification.json")
+				if notif['alert_way'] != "software_test":
+					sftp.envio(notif,name='Notification')
+					os.system("rm /home/pi/Resiliente_CD/Notification.json")
 		else:
 			gpio.output(13,0)
 			gpio.output(12,0)
@@ -212,8 +213,9 @@ def main():
 				notif['ip'] = conf['pi']['ip']
 				notif['enabled_alert'] = False
 				notif['alert_way'] = conf['modulos'][str(last_slave)]['nombre']
-				sftp.envio(notif,name='Notification')
-				os.system("rm /home/pi/Resiliente_CD/Notification.json")
+				if notif['alert_way'] != "software_test":
+					sftp.envio(notif,name='Notification')
+					os.system("rm /home/pi/Resiliente_CD/Notification.json")
 		conn.close()
 		time.sleep(1)
 
@@ -458,7 +460,8 @@ def verificar_patron(mod):
 		modulos = config["modulos"]
 		err = {}
 		for m in sorted(modulos.items()):
-			err[m[1]["nombre"]] = m[1]["error"]
+			if int(m[0]) != 0:
+				err[m[1]["nombre"]] = m[1]["error"]
 
 	print('[*] Verificando datos: monitoreo ',mod)
 

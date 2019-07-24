@@ -52,6 +52,8 @@ def main():
 				return 1
 
 			for mod in sorted(modulos.items()):
+				if int(mod[0]) == 0:
+					pass
 				reg = client.read_holding_registers(0,mod[1]['monit_tamanio'],unit=int(mod[0]))
 				if not reg.isError():
 					print("|-[+] Registros Monitoreo ",mod[1]['nombre'],": ",reg.registers)
